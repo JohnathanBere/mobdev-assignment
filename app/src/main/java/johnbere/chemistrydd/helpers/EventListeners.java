@@ -7,9 +7,11 @@ import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 
@@ -62,7 +64,10 @@ public class EventListeners {
 
                     el.setVisibility(View.VISIBLE);
 
-                    Log.d("JB", "The listener detects  " + activity.interactions.getElements().size() + " elements");
+                    // Log.d("JB", "The listener detects  " + activity.interactions.getElements().size + " elements");
+//                    for (Element e : activity.interactions.getElements()) {
+//                        Log.d(e.getName(), "Positions: " + e.x + ", " + e.y);
+//                    }
 
                     activity.interactions.updateElementInList(el);
 
@@ -76,32 +81,29 @@ public class EventListeners {
     public View.OnTouchListener ElementTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-
-            Element el = (Element)v;
-            // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
-            // that element
-            if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
-                    && (event.getY() > el.r.y - el.r.height && event.getY() < el.r.y + el.r.width)) {
-                el.handleTouch(el, event);
+            try {
+                Element el = (Element)v;
+                // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
+                // that element
+                if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
+                        && (event.getY() > el.r.y - el.r.height && event.getY() < el.r.y + el.r.width)) {
+                    el.handleTouch(el, event);
+                }
             }
+            catch(Exception ex) {
+                Compound el = (Compound) v;
+                // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
+                // that element
+                if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
+                        && (event.getY() > el.r.y - el.r.height && event.getY() < el.r.y + el.r.width)) {
+                    el.handleTouch(el, event);
+                }
 
+                else {
+                    Toast.makeText(activity, "There has been a serious error: " +  ex.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
             return false;
         }
     };
-
-//    public static View.OnDragListener ElementDragListener = new View.OnDragListener() {
-//        @Override
-//        public boolean onDrag(View v, DragEvent event) {
-//            int action = event.getAction();
-//            Element el = (Element)v;
-//
-//            if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
-//                    && (event.getY() > el.r.y - el.r.height && event.getX() < el.r.y + el.r.width)) {
-//                el.handleDrag(el, event);
-//            }
-//
-//
-//            return true;
-//        }
-//    };
 }
