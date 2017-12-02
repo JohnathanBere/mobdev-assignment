@@ -1,17 +1,19 @@
 package johnbere.chemistrydd;
 
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+
+import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
 /**
  * This class is a game object, that can be dragged and dropped
@@ -22,47 +24,33 @@ import android.view.ViewGroup;
  */
 public class Element extends View {
     // Set basic information about the element such as its name and formula
-    private String name;
-    private String formula;
-    private Paint formulaColor;
-    private Paint shapeColor;
-    Rectangle r;
+    // a lot of properties can be mutated directly, need to make those private and put in place accessors instead.
+    private String name, formula;
+    private Paint formulaColor, shapeColor, redColor;
+    public Rectangle r;
+    public Rect rect;
+    int elementId;
 
 
-    float x = 500, y = 300, prevX, prevY;
-
-    /**
-     * Event listener to move the element along the screen.
-     */
-    OnTouchListener touch = new OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            // Gets current coordinates
-            x = motionEvent.getX();
-            y = motionEvent.getY();
-
-            if (motionEvent.getAction() == motionEvent.ACTION_DOWN) {
-                prevX = x;
-                prevY = y;
-            }
-
-            view.invalidate();
-            return true;
-        }
-    };
+    public float x = 500, y = 300;
 
     public boolean handleTouch(View v, MotionEvent event) {
         int action = event.getAction();
-        Element el = (Element)v;
+        // Element el = (Element)v;
 
         if (action == MotionEvent.ACTION_DOWN) {
-            ClipData data = ClipData.newPlainText("", "");
+            // ClipData data = ClipData.newPlainText("", "");
+            ClipData.Item item = new ClipData.Item(v.getTag().toString());
+            String[] mimeTypes = {ClipDescription.MIMETYPE_TEXT_PLAIN};
+
+            ClipData data = new ClipData(v.getTag().toString(), mimeTypes, item);
 
             // Ensure that the shadow touch point is equal to the positions of the clicks.
-            ElementShadowBuilder shadowBuilder = new ElementShadowBuilder(el, (int)event.getX(), (int)event.getY());
+            ShapeShadowBuilder shadowBuilder = new ShapeShadowBuilder(v, (int)event.getX(), (int)event.getY());
 
+//            Log.d("JB", "" + data);
 
-            el.startDrag(data, shadowBuilder, el, 0);
+            v.startDrag(data, shadowBuilder, v, 0);
             return true;
         }
 
@@ -72,11 +60,11 @@ public class Element extends View {
     public void handleDrag(View v, DragEvent event) {
         int action = event.getAction();
         Element el = (Element)event.getLocalState();
-        ViewGroup.LayoutParams layoutParams = (ViewGroup.LayoutParams)v.getLayoutParams();
 
         switch (action) {
             case DragEvent.ACTION_DRAG_STARTED:
                 Log.d("JB", "The element " + el.getName() + " is being dragged");
+                Log.d("JB", el.getName() + " tag info: " + el.getTag());
                 /**
                  * TODO Log the el axis and with to observe if any changes or coords are detected in any of the events.
                  */
@@ -84,22 +72,26 @@ public class Element extends View {
 
             case DragEvent.ACTION_DRAG_ENTERED:
                 Log.d("JB", "DRAG_ENTERED w/ " + el.getName());
-                int x_coord = (int)event.getX();
-                int y_coord = (int)event.getY();
+//                int x_coord = (int)event.getX();
+//                int y_coord = (int)event.getY();
                 break;
 
             case DragEvent.ACTION_DRAG_EXITED:
                 Log.d("JB", "DRAG_EXITED w/ " + el.getName());
 
-                this.shapeColor.setColor(Color.DKGRAY);
-                this.x = event.getX();
-                this.y = event.getY();
+//                this.shapeColor.setColor(Color.DKGRAY);
+//                this.x = event.getX();
+//                this.y = event.getY();
                 break;
 
             case DragEvent.ACTION_DRAG_LOCATION:
                 Log.d("JB", "DRAG_LOCATION w/ " + el.getName());
-                x_coord = (int)event.getX();
-                y_coord = (int)event.getY();
+//                x_coord = (int)event.getX();
+//                y_coord = (int)event.getY();
+//                this.x = x_coord;
+//                this.y = y_coord;
+//                this.r.x = x_coord;
+//                this.r.y = y_coord;
 
                 break;
 
@@ -109,14 +101,12 @@ public class Element extends View {
                 break;
 
             case DragEvent.ACTION_DROP:
-                Log.d("JB", "DRAG_DROP");
+                Log.d("JB", "DRAG_DROP w/ " + el.getName());
 
-                el.setVisibility(VISIBLE);
-                el.setX(event.getX());
-                el.setY(event.getY());
                 break;
 
             default:
+                Log.d("JB", "Program unsure of user intentions");
                 break;
         }
     }
@@ -127,21 +117,31 @@ public class Element extends View {
      * @param name
      * @param formula
      */
-    public Element(Context context, String name, String formula, float x, float y) {
+    public Element(Context context, String name, String formula, float x, float y, int elementId) {
         super(context);
         this.name = name;
         this.formula = formula;
         this.x = x;
         this.y = y;
+        this.elementId = elementId;
 
         formulaColor = new Paint();
         shapeColor = new Paint();
+        redColor = new Paint();
 
+        // This will act as an internal stencil for the rect property to begin drawing around the Element bubble.
         r = new Rectangle();
         r.x=(int)x;
         r.y=(int)y;
         r.width=160;
         r.height=160;
+
+        // To ensure proper alignment, the rect begins drawing at each axis take away half of the stencil dimensions.
+        rect = new Rect();
+        rect.top = (int)this.y - r.height / 2;
+        rect.bottom = rect.top + r.height;
+        rect.left = (int)this.x - r.width / 2;
+        rect.right = rect.left + r.width;
     }
 
     /**
@@ -152,34 +152,33 @@ public class Element extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // Set the colors
-
+        redColor.setColor(Color.RED);
         formulaColor.setColor(Color.WHITE);
         shapeColor.setColor(Color.BLACK);
         formulaColor.setTextSize(60);
         formulaColor.setTextAlign(Paint.Align.CENTER);
 
+
         canvas.drawCircle(x, y, 80, shapeColor);
         canvas.drawText(this.formula, x, y + 16, formulaColor);
+        canvas.drawRect(this.rect, redColor);
     }
 
     public String getName() {
         return name;
     }
-}
 
-class ElementShadowBuilder extends View.DragShadowBuilder {
-    int x;
-    int y;
-
-    public ElementShadowBuilder(View view, int x, int y) {
-        super(view);
-        this.x = x;
-        this.y = y;
+    public int getElementId() {
+        return elementId;
     }
 
-    @Override
-    public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
-        super.onProvideShadowMetrics(outShadowSize, outShadowTouchPoint);
-        outShadowTouchPoint.set(x, y);
+    public void reCalculateCoord() {
+        // This method will be called when the drag state is acknowledged by the layout, thereby recalculating the internal rectangle
+        // of the element.
+        this.rect.left = this.r.x - this.r.width / 2;
+        this.rect.top = this.r.y - this.r.height / 2;
+
+        this.rect.right = this.rect.left + this.r.width;
+        this.rect.bottom = this.rect.top + this.r.height;
     }
 }
