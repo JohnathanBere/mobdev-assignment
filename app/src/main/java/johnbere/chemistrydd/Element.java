@@ -1,17 +1,16 @@
 package johnbere.chemistrydd;
 
 import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
-import android.util.Log;
-import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+
+import johnbere.chemistrydd.helpers.*;
 
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
@@ -25,15 +24,18 @@ import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 public class Element extends View {
     // Set basic information about the element such as its name and formula
     // a lot of properties can be mutated directly, need to make those private and put in place accessors instead.
-    String name, formula;
+    protected String name, formula;
     private Paint formulaColor, shapeColor, rectColor;
-    public Rectangle r;
-    public Rect rect;
-    int elementId, color;
-    public float x, y;
+    private Rectangle r;
+    private Rect rect;
+    private int elementId, color;
+    private float x, y;
+    private ElementGroup group;
 
     public boolean handleTouch(View v, MotionEvent event) {
         int action = event.getAction();
+
+        // Log.d("JB", "Current window dimensions: " + dimensions.widthPixels + " " + dimensions.heightPixels);
 
         if (action == MotionEvent.ACTION_DOWN) {
             ClipData data = ClipData.newPlainText("", "");
@@ -41,9 +43,8 @@ public class Element extends View {
             // Ensure that the shadow touch point is equal to the positions of the clicks.
             ShapeShadowBuilder shadowBuilder = new ShapeShadowBuilder(v, (int)event.getX(), (int)event.getY());
 
-//            Log.d("JB", "" + data);
-
             v.startDrag(data, shadowBuilder, v, 0);
+
             return true;
         }
         return false;
@@ -52,7 +53,7 @@ public class Element extends View {
     /**
      * Constructor to ensure that whenever this element is instantiated, it has a name and formula
      */
-    public Element(Context context, String name, String formula, float x, float y, int elementId, int color) {
+    public Element(Context context, String name, String formula, float x, float y, int elementId, int color, ElementGroup group) {
         super(context);
         this.name = name;
         this.formula = formula;
@@ -60,6 +61,7 @@ public class Element extends View {
         this.y = y;
         this.elementId = elementId;
         this.color = color;
+        this.group = group;
 
         formulaColor = new Paint();
         shapeColor = new Paint();
@@ -140,5 +142,37 @@ public class Element extends View {
     @Override
     public void setY(float y) {
         this.y = y;
+    }
+
+    public int getSquareY() {
+        return this.r.y;
+    }
+
+    public void setSquareY(int y) {
+        this.r.y = y;
+    }
+
+    public int getSquareX() {
+        return this.r.x;
+    }
+
+    public void setSquareX(int x) {
+        this.r.x = x;
+    }
+
+    public int getSquareH() {
+        return this.r.height;
+    }
+
+    public void setSquareH(int h) {
+        this.r.height = h;
+    }
+
+    public int getSquareW() {
+        return this.r.width;
+    }
+
+    public void setSquareW(int w) {
+        this.r.width = w;
     }
 }

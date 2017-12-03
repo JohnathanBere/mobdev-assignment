@@ -1,16 +1,10 @@
 package johnbere.chemistrydd.helpers;
 
-
-import android.support.constraint.ConstraintLayout;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-
 import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
@@ -28,6 +22,11 @@ public class EventListeners {
         public boolean onDrag(View view, DragEvent event) {
             int action = event.getAction();
 
+            DisplayMetrics dimensions = view.getResources().getDisplayMetrics();
+
+            int windowWidth = dimensions.widthPixels;
+            int windowHeight = dimensions.heightPixels;
+
             Element el = (Element)event.getLocalState();
 
             // Log.d("JB", "Elements in interaction container" + interactions.getElements());
@@ -37,6 +36,8 @@ public class EventListeners {
                     Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
                     float new_x;
                     float new_y;
+                    float prev_x = el.getX();
+                    float prev_y = el.getY();
 
                     el.setVisibility(View.INVISIBLE);
 
@@ -46,30 +47,36 @@ public class EventListeners {
                     Log.d("JB", "The dragging of " + el.getName() + " ended lol");
                     return false;
 
+                case DragEvent.ACTION_DRAG_LOCATION:
+                    Log.d("JB", event.getX() + " " + event.getY());
+                    return false;
+
                 case DragEvent.ACTION_DROP:
-                    Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
+                    // Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
 
                     // Error, when you drop outside of the main layout, the element disappears.
                     new_x = event.getX();
                     new_y = event.getY();
 
-                    el.x = new_x;
-                    el.y = new_y;
+//                    if (event.getX() + event.getX() * 0.1 > windowWidth && event.getX() - event.getX() / 2 < windowWidth)
+//                    {
+//                        Log.d("X-axes", "Safe here!");
+//                    }
 
-                    el.r.x = (int)new_x;
-                    el.r.y = (int)new_y;
+                    el.setX(new_x);
+                    el.setY(new_y);
+                    el.setSquareX((int)new_x);
+                    el.setSquareY((int)new_y);
 
                     // re-aligns the element rectangle, detecting if any intersections have been made.
                     el.reCalculateCoord();
 
                     el.setVisibility(View.VISIBLE);
 
-                    // Log.d("JB", "The listener detects  " + activity.interactions.getElements().size + " elements");
-//                    for (Element e : activity.interactions.getElements()) {
-//                        Log.d(e.getName(), "Positions: " + e.x + ", " + e.y);
-//                    }
-
-                    activity.interactions.updateElementInList(el);
+                    // Very untidy, this unreliable check sees to it that an element will not turn into another
+                    // compound from the same
+                    if (!(event.getLocalState() instanceof Compound))
+                        activity.interactions.updateElementInList(el);
 
                     return true;
             }
@@ -81,27 +88,13 @@ public class EventListeners {
     public View.OnTouchListener ElementTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            try {
-                Element el = (Element)v;
-                // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
-                // that element
-                if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
-                        && (event.getY() > el.r.y - el.r.height && event.getY() < el.r.y + el.r.width)) {
-                    el.handleTouch(el, event);
-                }
-            }
-            catch(Exception ex) {
-                Compound el = (Compound) v;
-                // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
-                // that element
-                if ((event.getX() > el.r.x - el.r.width && event.getX() < el.r.x + el.r.width)
-                        && (event.getY() > el.r.y - el.r.height && event.getY() < el.r.y + el.r.width)) {
-                    el.handleTouch(el, event);
-                }
-
-                else {
-                    Toast.makeText(activity, "There has been a serious error: " +  ex.getMessage(), Toast.LENGTH_LONG).show();
-                }
+            Element el = (Element)v;
+            // Log.d("JB", "Screen dimensions ");
+            // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
+            // that element
+            if ((event.getX() > el.getSquareX() - el.getSquareW() && event.getX() < el.getSquareX() + el.getSquareW())
+                    && (event.getY() > el.getSquareY() - el.getSquareH() && event.getY() < el.getSquareY() + el.getSquareH())) {
+                el.handleTouch(v, event);
             }
             return false;
         }
