@@ -11,6 +11,7 @@ import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 import johnbere.chemistrydd.R;
 import android.os.Vibrator;
+import android.widget.Toast;
 
 
 /**
@@ -21,7 +22,6 @@ public class ViewInteractions {
     private ArrayList<Compound> compounds;
     private MainActivity activity;
     private int incr;
-    private Vibrator vibr;
     private Element element1, element2;
 
     public ViewInteractions(MainActivity activity) {
@@ -44,28 +44,38 @@ public class ViewInteractions {
      * Rename elements to reactant (as not only elements can form a compound, compounds can as well)
      * Need to create a check to see whether an element or compound is one of the reactants.
      */
-
-
     void findNearbyElements(View param) {
         Element el = (Element)param;
-        // int marginOfError = 50;
         for (Element element : this.elements) {
             // check if an element that isn't the same as what's on the parameter, is nearby
-            if (
-                    !(el instanceof Compound) &&
-                    !(element instanceof Compound) &&
-                    (el.getGroup() != element.getGroup()) &&
-                    (el.getElementId() != element.getElementId()) &&
-                    // Check if displaced element intersects with nearby shapes
-                    (el.getRect().intersect(element.getRect()))
-                    /*
-                    (
-                            (element.getX() > el.getX() - marginOfError && element.getX() < el.getX() + marginOfError) &&
-                            (element.getY() > el.getY() - marginOfError && element.getY() < el.getY() + marginOfError)
-                    ) */
-                )
+            if
+            (
+                // that the evaluated elements are not instances of compounds
+                !(el instanceof Compound) &&
+                !(element instanceof Compound) &&
+                // that for these exercises, they do not belong in the same group
+                (el.getGroup() != element.getGroup()) &&
+                // and that the element is not trying to react with itself.
+                (el.getElementId() != element.getElementId()) &&
+                // Check if displaced element intersects with nearby shapes
+                (el.getRect().intersect(element.getRect()))
+            )
             {
                 this.reactElements(el, element);
+                break;
+            }
+            else if
+            (
+                !(el instanceof Compound) &&
+                !(element instanceof Compound) &&
+                (el.getGroup() == element.getGroup()) &&
+                (el.getElementId() != element.getElementId()) &&
+                (el.getRect().intersect(element.getRect()))
+            )
+            {
+                activity.buzzer.start();
+                activity.vibr.vibrate(1000);
+                Toast.makeText(activity, "That just won't do!", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -101,9 +111,8 @@ public class ViewInteractions {
 
         compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
 
-        activity.player.start();
-        vibr = (Vibrator)activity.getSystemService(Context.VIBRATOR_SERVICE);
-        vibr.vibrate(500);
+        activity.pop.start();
+        activity.vibr.vibrate(500);
 
         content.addView(compound);
 

@@ -7,10 +7,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
 import johnbere.chemistrydd.helpers.*;
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
@@ -34,9 +33,6 @@ public class Element extends View {
 
     public boolean handleTouch(View v, MotionEvent event) {
         int action = event.getAction();
-        DisplayMetrics dimensions = getRootView().getResources().getDisplayMetrics();
-        int windowWidth = dimensions.widthPixels;
-        int windowHeight = dimensions.heightPixels;
 
         switch(action) {
             case MotionEvent.ACTION_DOWN:
@@ -45,10 +41,6 @@ public class Element extends View {
                 ShapeShadowBuilder shadowBuilder = new ShapeShadowBuilder(v, (int)this.getX(), (int)this.getY());
                 v.startDrag(data, shadowBuilder, v, 0);
                 return true;
-
-            case MotionEvent.ACTION_MOVE:
-
-                break;
 
             default:
                 break;

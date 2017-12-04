@@ -50,6 +50,7 @@ public class Compound extends Element {
      */
     public void redraw() {
         this.setShapeRadius(this.getShapeRadius() * 2);
+        this.animate().setDuration(3).start();
         this.invalidate();
     }
 }

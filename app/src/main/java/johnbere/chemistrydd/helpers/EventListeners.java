@@ -9,12 +9,13 @@ import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 
 // Just need to abstract away the event listeners to make the code a bit tidier
 public class EventListeners {
-    MainActivity activity;
+    private MainActivity activity;
 
     public EventListeners(MainActivity activity) {
         this.activity = activity;
@@ -24,22 +25,19 @@ public class EventListeners {
         @Override
         public boolean onDrag(View view, DragEvent event) {
             int action = event.getAction();
-
-            DisplayMetrics dimensions = view.getResources().getDisplayMetrics();
-            int windowWidth = dimensions.widthPixels;
-            int windowHeight = dimensions.heightPixels;
-
-            ViewGroup.MarginLayoutParams margins = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
-
             Element el = (Element)event.getLocalState();
+            // ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
+            // DisplayMetrics metrics = view.getResources().getDisplayMetrics();
+            // int windowHeight = metrics.heightPixels;
+            // int windowWidth = metrics.widthPixels;
+            // params.setMargins(80,80, windowWidth - 80, windowHeight - 80);
+            // view.setLayoutParams(params);
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
                     float new_x;
                     float new_y;
-                    float prev_x = el.getX();
-                    float prev_y = el.getY();
                     el.setVisibility(View.INVISIBLE);
 
                     return true;
@@ -50,8 +48,20 @@ public class EventListeners {
 
                 case DragEvent.ACTION_DRAG_LOCATION:
                     // Log.d("JB", event.getX() + " " + event.getY());
-//                    if (el.getX() > 80 && el.getX() < windowWidth - 80 && el.getY() > 80 && el.getY() < windowHeight - 80)
-//                        return true;
+
+                    if
+                    (
+                            // Acknowledges the limits of the screen
+                            (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
+                            (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
+                    )
+                    {
+                        Log.d("Bounds", "Acceptable");
+                    }
+                    else {
+                        Log.d("Bounds", "Unacceptable");
+                    }
+
                     return false;
 
                 case DragEvent.ACTION_DROP:
@@ -61,11 +71,6 @@ public class EventListeners {
                     new_x = event.getX();
                     new_y = event.getY();
 
-//                    if (event.getX() + event.getX() * 0.1 > windowWidth && event.getX() - event.getX() / 2 < windowWidth)
-//                    {
-//                        Log.d("X-axes", "Safe here!");
-//                    }
-
                     el.setX(new_x);
                     el.setY(new_y);
                     el.setSquareX((int)new_x);
@@ -73,12 +78,10 @@ public class EventListeners {
 
                     // re-aligns the element rectangle, detecting if any intersections have been made.
                     el.reCalculateCoord();
-
                     el.setVisibility(View.VISIBLE);
 
                     // Very untidy, this unreliable check sees to it that an element will not turn into another
                     // compound from the same
-                    // if (!(event.getLocalState() instanceof Compound))
                     activity.interactions.updateElementInList(el);
 
                     return true;
@@ -91,7 +94,6 @@ public class EventListeners {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             Element el = (Element)v;
-            // Log.d("JB", "Screen dimensions ");
             // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
             // that element
             if
