@@ -43,9 +43,8 @@ public class Element extends View {
                 return true;
 
             default:
-                break;
+                return false;
         }
-        return false;
     }
 
     /**
@@ -104,7 +103,6 @@ public class Element extends View {
         shapeColor.setColor(color);
         formulaColor.setTextSize(60);
         formulaColor.setTextAlign(Paint.Align.CENTER);
-
 
         canvas.drawCircle(x, y, this.shapeRadius, shapeColor);
         canvas.drawText(this.formula, x, y + 16, formulaColor);

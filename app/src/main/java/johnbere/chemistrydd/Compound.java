@@ -1,6 +1,8 @@
 package johnbere.chemistrydd;
 
 import android.content.Context;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.ScaleAnimation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +23,7 @@ public class Compound extends Element {
         String form = "";
         String compoundName = "";
 
-        // Sort constituent elements by group number
+        // Sort constituent elements by group
         Collections.sort(elements, new Comparator<Element>() {
             @Override
             public int compare(Element element1, Element element2) {
@@ -33,6 +35,7 @@ public class Compound extends Element {
             form = form + el.getFormula();
             if (el.getGroup() == ElementGroup.ALKALIMETALS)
                 compoundName = compoundName + el.getName() + " ";
+            // Halogens will be suffixed with 'ide'
             if (el.getGroup() == ElementGroup.HALOGENS) {
                 StringBuilder halogenName = new StringBuilder(el.getName());
                 halogenName.setCharAt(halogenName.length() - 2, 'd');
@@ -47,10 +50,13 @@ public class Compound extends Element {
 
     /**
      * A newly formed Compound should double in radius
+     *
+     * Figure out a way to animate the scale
      */
     public void redraw() {
         this.setShapeRadius(this.getShapeRadius() * 2);
-        this.animate().setDuration(3).start();
-        this.invalidate();
+        this.setSquareH(this.getSquareH() * 2);
+        this.setSquareW(this.getSquareW() * 2);
+        this.reCalculateCoord();
     }
 }

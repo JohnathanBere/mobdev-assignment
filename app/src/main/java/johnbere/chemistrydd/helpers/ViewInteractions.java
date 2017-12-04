@@ -1,6 +1,5 @@
 package johnbere.chemistrydd.helpers;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +9,6 @@ import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 import johnbere.chemistrydd.R;
-import android.os.Vibrator;
 import android.widget.Toast;
 
 
@@ -41,7 +39,7 @@ public class ViewInteractions {
      * another 'compound'
      *
      * Todo
-     * Rename elements to reactant (as not only elements can form a compound, compounds can as well)
+     * [x] Rename elements to reactant (as not only elements can form a compound, compounds can as well)
      * Need to create a check to see whether an element or compound is one of the reactants.
      */
     void findNearbyElements(View param) {
@@ -64,6 +62,8 @@ public class ViewInteractions {
                 this.reactElements(el, element);
                 break;
             }
+            // If the statement similiar to the previous checks except the element and intersectioned element
+            // Are of the same group, prevent the elements from combining.
             else if
             (
                 !(el instanceof Compound) &&
@@ -132,7 +132,9 @@ public class ViewInteractions {
             if (castEl.getElementId() == element.getElementId()) {
                 // gets the index of the selected element provided that it is the same element as the instance element
                 int index = this.elements.indexOf(element);
+                // updates the element with the given index in terms of axes.
                 this.elements.set(index, castEl);
+                // proceeds to find nearby elements to form a compound with
                 this.findNearbyElements(castEl);
             }
         }
@@ -166,8 +168,16 @@ public class ViewInteractions {
         this.compounds.add(compound);
     }
 
+    public void addElementToList(Element element) {
+        this.elements.add(element);
+    }
+
     public void removeElementFromList(Element element) {
         this.elements.remove(element);
+    }
+
+    public void removeCompoundFromList(Compound compound) {
+        this.compounds.remove(compound);
     }
 
     public void setIncr (int incr) {

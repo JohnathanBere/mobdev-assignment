@@ -3,12 +3,10 @@ package johnbere.chemistrydd.helpers;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
@@ -26,20 +24,17 @@ public class EventListeners {
         public boolean onDrag(View view, DragEvent event) {
             int action = event.getAction();
             Element el = (Element)event.getLocalState();
-            // ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams)view.getLayoutParams();
-            // DisplayMetrics metrics = view.getResources().getDisplayMetrics();
-            // int windowHeight = metrics.heightPixels;
-            // int windowWidth = metrics.widthPixels;
-            // params.setMargins(80,80, windowWidth - 80, windowHeight - 80);
-            // view.setLayoutParams(params);
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
                     float new_x;
                     float new_y;
-                    el.setVisibility(View.INVISIBLE);
+                    return true;
 
+                // Set the dragged element to being invisible when the dragging has been initiated
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    el.setVisibility(View.INVISIBLE);
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
@@ -68,25 +63,48 @@ public class EventListeners {
                     Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
 
                     // Error, when you drop outside of the main layout, the element disappears.
+                    // This issue has been fixed, the element shadow returns to the original position
+                    // of the element
                     new_x = event.getX();
                     new_y = event.getY();
+                    float prevX = el.getX();
+                    float prevY = el.getY();
 
-                    el.setX(new_x);
-                    el.setY(new_y);
-                    el.setSquareX((int)new_x);
-                    el.setSquareY((int)new_y);
+                    if
+                    (
+                            (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
+                            (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
+                    )
+                    {
+                        setShapeCoords(el, new_x, new_y);
+                        return true;
+                    }
+                    else {
+                        setShapeCoords(el, prevX, prevY);
+                        return false;
+                    }
 
-                    // re-aligns the element rectangle, detecting if any intersections have been made.
-                    el.reCalculateCoord();
+                // Get the element to turn visible once dragging has stopped
+                case DragEvent.ACTION_DRAG_EXITED:
                     el.setVisibility(View.VISIBLE);
-
-                    // Very untidy, this unreliable check sees to it that an element will not turn into another
-                    // compound from the same
-                    activity.interactions.updateElementInList(el);
-
-                    return true;
+                    return false;
             }
             return true;
+        }
+
+        private void setShapeCoords(Element el, float new_x, float new_y) {
+            el.setX(new_x);
+            el.setY(new_y);
+            el.setSquareX((int)new_x);
+            el.setSquareY((int)new_y);
+
+            // re-aligns the element rectangle, detecting if any intersections have been made.
+            el.reCalculateCoord();
+            el.setVisibility(View.VISIBLE);
+
+            // Very untidy, this unreliable check sees to it that an element will not turn into another
+            // compound from the same
+            activity.interactions.updateElementInList(el);
         }
     };
 
