@@ -7,11 +7,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
 import johnbere.chemistrydd.helpers.*;
-
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
 /**
@@ -28,24 +28,30 @@ public class Element extends View {
     private Paint formulaColor, shapeColor, rectColor;
     private Rectangle r;
     private Rect rect;
-    private int elementId, color;
+    private int elementId, color, shapeRadius;
     private float x, y;
     private ElementGroup group;
 
     public boolean handleTouch(View v, MotionEvent event) {
         int action = event.getAction();
+        DisplayMetrics dimensions = getRootView().getResources().getDisplayMetrics();
+        int windowWidth = dimensions.widthPixels;
+        int windowHeight = dimensions.heightPixels;
 
-        // Log.d("JB", "Current window dimensions: " + dimensions.widthPixels + " " + dimensions.heightPixels);
+        switch(action) {
+            case MotionEvent.ACTION_DOWN:
+                ClipData data = ClipData.newPlainText("", "");
+                // Ensure that the shadow touch point is equal to the positions of the clicks.
+                ShapeShadowBuilder shadowBuilder = new ShapeShadowBuilder(v, (int)this.getX(), (int)this.getY());
+                v.startDrag(data, shadowBuilder, v, 0);
+                return true;
 
-        if (action == MotionEvent.ACTION_DOWN) {
-            ClipData data = ClipData.newPlainText("", "");
+            case MotionEvent.ACTION_MOVE:
 
-            // Ensure that the shadow touch point is equal to the positions of the clicks.
-            ShapeShadowBuilder shadowBuilder = new ShapeShadowBuilder(v, (int)event.getX(), (int)event.getY());
+                break;
 
-            v.startDrag(data, shadowBuilder, v, 0);
-
-            return true;
+            default:
+                break;
         }
         return false;
     }
@@ -62,6 +68,7 @@ public class Element extends View {
         this.elementId = elementId;
         this.color = color;
         this.group = group;
+        this.shapeRadius = 80;
 
         formulaColor = new Paint();
         shapeColor = new Paint();
@@ -69,10 +76,10 @@ public class Element extends View {
 
         // This will act as an internal stencil for the rect property to begin drawing around the Element bubble.
         r = new Rectangle();
-        r.x=(int)x;
-        r.y=(int)y;
-        r.width=160;
-        r.height=160;
+        r.x= (int)x;
+        r.y= (int)y;
+        r.width= this.shapeRadius * 2;
+        r.height= this.shapeRadius * 2;
 
         // To ensure proper alignment, the rect begins drawing at each axis take away half of the stencil dimensions.
         rect = new Rect();
@@ -107,13 +114,17 @@ public class Element extends View {
         formulaColor.setTextAlign(Paint.Align.CENTER);
 
 
-        canvas.drawCircle(x, y, 80, shapeColor);
+        canvas.drawCircle(x, y, this.shapeRadius, shapeColor);
         canvas.drawText(this.formula, x, y + 16, formulaColor);
         canvas.drawRect(this.rect, rectColor);
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getElementId() {
@@ -174,5 +185,25 @@ public class Element extends View {
 
     public void setSquareW(int w) {
         this.r.width = w;
+    }
+
+    public Rect getRect() {
+        return this.rect;
+    }
+
+    public int getShapeRadius() {
+        return this.shapeRadius;
+    }
+
+    public void setShapeRadius(int radius) {
+        this.shapeRadius = radius;
+    }
+
+    public ElementGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(ElementGroup group) {
+        this.group = group;
     }
 }

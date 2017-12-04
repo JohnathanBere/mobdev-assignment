@@ -5,6 +5,7 @@ public enum ElementGroup {
 
     // GROUP 1 - ALKALI METALS
     // GROUP 7 - HALOGENS
-    GROUP1,
-    GROUP7
+    HYDROGEN,
+    ALKALIMETALS,
+    HALOGENS
 }

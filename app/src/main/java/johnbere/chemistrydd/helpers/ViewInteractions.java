@@ -1,5 +1,6 @@
 package johnbere.chemistrydd.helpers;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
@@ -9,6 +10,7 @@ import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 import johnbere.chemistrydd.R;
+import android.os.Vibrator;
 
 
 /**
@@ -19,12 +21,15 @@ public class ViewInteractions {
     private ArrayList<Compound> compounds;
     private MainActivity activity;
     private int incr;
+    private Vibrator vibr;
+    private Element element1, element2;
 
     public ViewInteractions(MainActivity activity) {
         this.activity = activity;
         this.compounds = new ArrayList<>();
+        this.element1 = null;
+        this.element2 = null;
     }
-
 
     /**
      * Write logic to check if an element's rectangle intersects with another.
@@ -35,35 +40,42 @@ public class ViewInteractions {
      * So if it was dropped near another element, they should combine (both disappearing) and re-appearing as
      * another 'compound'
      *
-     * To-do
+     * Todo
      * Rename elements to reactant (as not only elements can form a compound, compounds can as well)
      * Need to create a check to see whether an element or compound is one of the reactants.
      */
 
 
-    public void findNearbyElements(View param) {
+    void findNearbyElements(View param) {
         Element el = (Element)param;
-        int marginOfError = 50;
+        // int marginOfError = 50;
         for (Element element : this.elements) {
             // check if an element that isn't the same as what's on the parameter, is nearby
             if (
                     !(el instanceof Compound) &&
                     !(element instanceof Compound) &&
+                    (el.getGroup() != element.getGroup()) &&
                     (el.getElementId() != element.getElementId()) &&
+                    // Check if displaced element intersects with nearby shapes
+                    (el.getRect().intersect(element.getRect()))
+                    /*
                     (
                             (element.getX() > el.getX() - marginOfError && element.getX() < el.getX() + marginOfError) &&
-                            (element.getY() > el.getY() - marginOfError && element.getY() < el.getY() + marginOfError))
-                    ) {
-                Element foundElement = element;
-                // Log.d(element.getName(), "The other element has the formula of " + element.getFormula());
+                            (element.getY() > el.getY() - marginOfError && element.getY() < el.getY() + marginOfError)
+                    ) */
+                )
+            {
                 this.reactElements(el, element);
                 break;
             }
         }
     }
 
-    public void reactElements(Element firstElement, Element secondElement) {
+    void reactElements(Element firstElement, Element secondElement) {
         ArrayList<Element> reactants = new ArrayList<>();
+
+        Log.d("JB", "first element " + firstElement.getName());
+        Log.d("JB", "second element " + secondElement.getName());
 
         // Add the reactants to formulate a formula name
         reactants.add(firstElement);
@@ -73,24 +85,31 @@ public class ViewInteractions {
         firstElement.setVisibility(View.INVISIBLE);
         secondElement.setVisibility(View.INVISIBLE);
 
-        this.incr = this.compounds != null ? this.elements.size() + this.compounds.size() : this.elements.size();
         this.incr++;
 
-        // Instantiate
-        Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.BLUE, reactants);
+        // Instantiate a new compound, it will contain a list of the reacted elements.
+        Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.GREEN, reactants);
         addCompoundToList(compound);
+
+        // Make the parameters equivalent to the property of the view interactions observer
+        this.element1 = firstElement;
+        this.element2 = secondElement;
 
         ViewGroup content = activity.findViewById(R.id.content_main);
 
         Log.d("JB", "The new id of the compound is " + compound.getElementId());
 
-        // addCompoundToList(compound);
-
         compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
+
         activity.player.start();
+        vibr = (Vibrator)activity.getSystemService(Context.VIBRATOR_SERVICE);
+        vibr.vibrate(500);
 
         content.addView(compound);
 
+        // Remove the reacted elements from the view
+        content.removeView(firstElement);
+        content.removeView(secondElement);
     }
 
     /**
@@ -107,6 +126,14 @@ public class ViewInteractions {
                 this.elements.set(index, castEl);
                 this.findNearbyElements(castEl);
             }
+        }
+
+        // Remove the elements that were compared if they were acknowledged by this class
+        if (element1 != null && element2 != null) {
+            this.removeElementFromList(element1);
+            this.removeElementFromList(element2);
+            this.element1 = null;
+            this.element2 = null;
         }
     }
 
@@ -132,5 +159,9 @@ public class ViewInteractions {
 
     public void removeElementFromList(Element element) {
         this.elements.remove(element);
+    }
+
+    public void setIncr (int incr) {
+        this.incr = incr;
     }
 }
