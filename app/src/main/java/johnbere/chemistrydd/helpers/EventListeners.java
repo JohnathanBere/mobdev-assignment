@@ -5,6 +5,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -72,8 +73,8 @@ public class EventListeners {
 
                     if
                     (
-                            (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
-                            (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
+                        (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
+                        (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
                     )
                     {
                         setShapeCoords(el, new_x, new_y);
@@ -133,13 +134,27 @@ public class EventListeners {
      */
     public SensorEventListener SensorEventListener = new SensorEventListener() {
         @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
+        public void onSensorChanged(SensorEvent event) {
+            int sensorType = event.sensor.getType();
 
+            if (sensorType == Sensor.TYPE_ACCELEROMETER) {
+
+            }
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) {
 
+            if(sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                Log.d("Shook", "SHOOK");
+            }
+        }
+    };
+
+    public GestureDetector.SimpleOnGestureListener OverrideGestureListener = new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return super.onDoubleTap(e);
         }
     };
 }

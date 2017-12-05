@@ -2,11 +2,13 @@ package johnbere.chemistrydd;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.ViewGroup;
 import java.util.ArrayList;
 import johnbere.chemistrydd.helpers.ElementGroup;
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     ViewGroup content;
     public MediaPlayer pop, buzzer;
     SensorManager sensorManager;
+    Sensor accelerometer;
     public Vibrator vibr;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         pop = MediaPlayer.create(this, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(this, R.raw.hypocore__buzzer);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         vibr = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
 
@@ -62,6 +66,6 @@ public class MainActivity extends AppCompatActivity {
             content.addView(co);
         }
         content.setOnDragListener(new EventListeners(this).LayoutDragListener);
-        // sensorManager.registerListener(new EventListeners(this).SensorEventListener);
+        sensorManager.registerListener(new EventListeners(this).SensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 }

@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -187,6 +189,14 @@ public class Element extends View {
 
     public void setShapeRadius(int radius) {
         this.shapeRadius = radius;
+    }
+
+    public void setShapeColor (int shapeColor) {
+        this.color = shapeColor;
+    }
+
+    public int getShapeColor() {
+        return this.color;
     }
 
     public ElementGroup getGroup() {
