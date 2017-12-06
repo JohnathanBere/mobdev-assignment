@@ -2,6 +2,8 @@ package johnbere.chemistrydd;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -21,58 +23,9 @@ import johnbere.chemistrydd.helpers.ElementGroup;
  */
 public class Compound extends Element {
     private ArrayList<Element> elements;
-    private boolean splitFlag;
+    private boolean splitFlag, hasSplit;
     private int originalShapeColor;
     private GestureDetector gestureDetector;
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return gestureDetector.onTouchEvent(event);
-    }
-
-    private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onDoubleTap(MotionEvent event) {
-            Log.d("Double", "CLICK");
-            setSplitFlag();
-            String message = getSplitFlag() ? " is marked for death" : " is not gonna split, yo";
-            Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
-        /**
-         * Todo
-         *
-         * When a compound is set to be split, shaking the phone will split the compound to its
-         * composing elements
-         */
-        @Override
-        public boolean onDown(MotionEvent event) {
-            /**
-             * The following handles logic autonomously for the triggering of the split flags
-             * This gesture listener will basically mark a compound for splitting.
-             */
-            if
-            (
-                (!splitFlag) &&
-                (event.getX() > getRect().left && event.getX() < getRect().right) &&
-                (event.getY() > getRect().top && event.getY() < getRect().bottom)
-            )
-            {
-                return true;
-            }
-            else if
-            (
-                (splitFlag) &&
-                (event.getX() > getRect().left && event.getX() < getRect().right) &&
-                (event.getY() > getRect().top && event.getY() < getRect().bottom)
-            )
-            {
-                return true;
-            }
-            return false;
-        }
-    };
 
 
     public Compound(Context context, String name, String formula, float x, float y, int elementId, int color, ArrayList<Element> elements) {
@@ -80,6 +33,7 @@ public class Compound extends Element {
         this.elements = elements;
         this.gestureDetector = new GestureDetector(context, gestureListener);
         this.splitFlag = false;
+        this.hasSplit = false;
 
         String form = "";
         String compoundName = "";
@@ -121,6 +75,23 @@ public class Compound extends Element {
         this.reCalculateCoord();
     }
 
+    public void triggerCompoundSplit() {
+        if (this.splitFlag) {
+            Toast.makeText(getContext(), "The compound " + this.getName() + " is about to split", Toast.LENGTH_SHORT).show();
+            this.splitToConstituents();
+        }
+    }
+
+    public void splitToConstituents() {
+        this.setVisibility(INVISIBLE);
+        String str = "Retrieved: ";
+        for (Element el : this.elements) {
+            str += el.getName() + ", \n";
+        }
+        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+        this.hasSplit = true;
+    }
+
     public boolean getSplitFlag()
     {
         return this.splitFlag;
@@ -132,13 +103,21 @@ public class Compound extends Element {
             // Store the initial color of the compound
             this.splitFlag = true;
             this.setInitialShapeColor();
-            this.setShapeColor(Color.RED);
+            this.setShapeColor(Color.MAGENTA);
         }
         else {
             this.splitFlag = false;
             this.setShapeColor(this.getOriginalShapeColor());
         }
         this.invalidate();
+    }
+
+    public boolean hasCompoundSplit() {
+        return this.hasSplit;
+    }
+
+    public ArrayList<Element> getElements() {
+        return this.elements;
     }
 
     public int getOriginalShapeColor() {
@@ -148,4 +127,53 @@ public class Compound extends Element {
     public void setInitialShapeColor() {
         this.originalShapeColor = this.getShapeColor();
     }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event);
+    }
+
+    private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onDoubleTap(MotionEvent event) {
+            Log.d("Double", "CLICK");
+            setSplitFlag();
+            String message = getSplitFlag() ? " is marked for death" : " is not gonna split, yo";
+            Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        /**
+         * Todo
+         *
+         * When a compound is set to be split, shaking the phone will split the compound to its
+         * composing elements
+         */
+        @Override
+        public boolean onDown(MotionEvent event) {
+            /**
+             * The following handles logic autonomously for the triggering of the split flags
+             * This gesture listener will basically mark a compound for splitting.
+             */
+            if
+                    (
+                    (!splitFlag) &&
+                            (event.getX() > getRect().left && event.getX() < getRect().right) &&
+                            (event.getY() > getRect().top && event.getY() < getRect().bottom)
+                    )
+            {
+                return true;
+            }
+            else if
+                    (
+                    (splitFlag) &&
+                            (event.getX() > getRect().left && event.getX() < getRect().right) &&
+                            (event.getY() > getRect().top && event.getY() < getRect().bottom)
+                    )
+            {
+                return true;
+            }
+            return false;
+        }
+    };
 }

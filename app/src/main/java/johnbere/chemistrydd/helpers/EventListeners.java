@@ -5,7 +5,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,6 +13,11 @@ import johnbere.chemistrydd.MainActivity;
 
 // Just need to abstract away the event listeners to make the code a bit tidier
 public class EventListeners {
+    /**
+     * Todo
+     * If at all possible, perhaps create a super class that includes main activity,
+     * meaning that subclasses will factor in all activities.
+     */
     private MainActivity activity;
 
     public EventListeners(MainActivity activity) {
@@ -124,37 +128,6 @@ public class EventListeners {
                 el.handleTouch(v, event);
             }
             return false;
-        }
-    };
-
-    /**
-     * Work on this to cause compound fission.
-     *
-     * i.e. break a compound down to its constituent reactants.
-     */
-    public SensorEventListener SensorEventListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            int sensorType = event.sensor.getType();
-
-            if (sensorType == Sensor.TYPE_ACCELEROMETER) {
-
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-
-            if(sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                Log.d("Shook", "SHOOK");
-            }
-        }
-    };
-
-    public GestureDetector.SimpleOnGestureListener OverrideGestureListener = new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            return super.onDoubleTap(e);
         }
     };
 }
