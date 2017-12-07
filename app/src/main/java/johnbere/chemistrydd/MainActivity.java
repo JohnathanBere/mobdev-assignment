@@ -8,7 +8,9 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -30,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ViewInteractions interactions = new ViewInteractions(this);
     ViewGroup content;
-    public MediaPlayer pop, buzzer;
+    public MediaPlayer pop, buzzer, bang;
     SensorManager sensorManager;
     private ShakeEventListener sensorListener;
     public Vibrator vibr;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         content = findViewById(R.id.content_main);
         pop = MediaPlayer.create(this, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(this, R.raw.hypocore__buzzer);
+        bang = MediaPlayer.create(this, R.raw.cydon_bang);
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         sensorListener = new ShakeEventListener();
         vibr = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -55,9 +58,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onShake() {
                 iterateOverCompounds(interactions.getCompounds());
+                // The interactions class should proceed to remove any compound that has been split
+                // from its observation
                 if (splitCompounds.size() > 0) {
+                    // If at least 2 or more compounds were split a bang sound should be made
+                    if (splitCompounds.size() >= 2) {
+                        bang.start();
+                        vibr.vibrate(3000);
+                    }
+                    // other wise just another pop
+                    else if (splitCompounds.size() < 2) {
+                        pop.start();
+                        vibr.vibrate(500);
+                    }
+
                     deletePrimedCompounds();
                 }
+                splitCompounds.clear();
+                Toast.makeText(MainActivity.this, "Number of compounds to split: " + splitCompounds.size(), Toast.LENGTH_SHORT).show();
             }
 
             void iterateOverCompounds(ArrayList<Compound> compounds) {
@@ -66,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
                     if (co.hasCompoundSplit()) {
                         elementsInCompound(co.getElements(), co.getX(), co.getY());
                         content.removeView(co);
+                        pop.start();
+                        vibr.vibrate(500);
                         splitCompounds.add(co);
                     }
                 }
@@ -74,12 +94,18 @@ public class MainActivity extends AppCompatActivity {
             void elementsInCompound(ArrayList<Element> elements, float x, float y) {
                 for (Element el : elements) {
                     Element element = new Element(MainActivity.this, el.getName(), el.getFormula(), x, y, elementId++, el.getShapeColor(), el.getGroup());
+                    if (elements.indexOf(el) == elements.size()) {
+                        // keep the elements separate
+                        // el.setX()
+                        // el.setY()
+                    }
                     element.setOnTouchListener(new EventListeners(MainActivity.this).ElementTouchListener);
                     content.addView(element);
                     interactions.addElementToList(element);
                 }
             }
 
+            // Finds out which compounds were split and should be removed from the interactions compound collection.
             void deletePrimedCompounds() {
                 for (Compound decomposedCompound : splitCompounds) {
                     interactions.removeCompoundFromList(decomposedCompound);

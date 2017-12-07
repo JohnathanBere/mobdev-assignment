@@ -2,7 +2,6 @@ package johnbere.chemistrydd;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.Toast;
@@ -71,16 +70,20 @@ public class Compound extends Element {
 
     public void triggerCompoundSplit() {
         if (this.splitFlag) {
-            Toast.makeText(getContext(), "The compound " + this.getName() + " is about to split", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), this.getName() + " is splitting", Toast.LENGTH_SHORT).show();
             this.splitToConstituents();
         }
     }
 
     public void splitToConstituents() {
         this.setVisibility(INVISIBLE);
-        String str = "Retrieved: ";
+        String str = "Retrieved: \n";
+        int elCount = this.elements.size() - 1;
         for (Element el : this.elements) {
-            str += el.getName() + ", \n";
+            if (this.elements.indexOf(el) < elCount)
+                str += el.getName() + ", \n";
+            else
+                str += el.getName();
         }
         Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
         this.hasSplit = true;
@@ -124,6 +127,8 @@ public class Compound extends Element {
         this.originalShapeColor = this.getShapeColor();
     }
 
+    // On the touchEvent of a compound, it should detect for possible double taps and then proceed to
+    // set the flag for a compound to split.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return gestureDetector.onTouchEvent(event);
@@ -133,9 +138,8 @@ public class Compound extends Element {
     private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDoubleTap(MotionEvent event) {
-            Log.d("Double", "CLICK");
             setSplitFlag();
-            String message = getSplitFlag() ? " is marked for death" : " is not gonna split, yo";
+            String message = getSplitFlag() ? " is marked to split" : " is not going to split";
             Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
             return true;
         }
@@ -152,21 +156,23 @@ public class Compound extends Element {
              * The following handles logic autonomously for the triggering of the split flags
              * This gesture listener will basically mark a compound for splitting.
              */
+            // As long as the touched compound in question has a flag that is either true or false, contact
+            // will have been made.
             if
-                    (
-                    (!splitFlag) &&
-                            (event.getX() > getRect().left && event.getX() < getRect().right) &&
-                            (event.getY() > getRect().top && event.getY() < getRect().bottom)
-                    )
+            (
+                (!splitFlag) &&
+                (event.getX() > getRect().left && event.getX() < getRect().right) &&
+                (event.getY() > getRect().top && event.getY() < getRect().bottom)
+            )
             {
                 return true;
             }
             else if
-                    (
-                    (splitFlag) &&
-                            (event.getX() > getRect().left && event.getX() < getRect().right) &&
-                            (event.getY() > getRect().top && event.getY() < getRect().bottom)
-                    )
+            (
+                (splitFlag) &&
+                (event.getX() > getRect().left && event.getX() < getRect().right) &&
+                (event.getY() > getRect().top && event.getY() < getRect().bottom)
+            )
             {
                 return true;
             }

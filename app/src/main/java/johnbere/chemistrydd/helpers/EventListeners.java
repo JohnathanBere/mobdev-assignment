@@ -1,9 +1,10 @@
 package johnbere.chemistrydd.helpers;
 
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
+
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
 
@@ -28,7 +29,7 @@ public class EventListeners {
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
+                    //Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
                     float new_x;
                     float new_y;
                     return true;
@@ -36,15 +37,15 @@ public class EventListeners {
                 // Set the dragged element to being invisible when the dragging has been initiated
                 case DragEvent.ACTION_DRAG_ENTERED:
                     el.setVisibility(View.INVISIBLE);
+                    Toast.makeText(activity, "Dragging " + el.getName(), Toast.LENGTH_SHORT).show();
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
-                    Log.d("JB", "The dragging of " + el.getName() + " ended lol");
+                    //Log.d("JB", "The dragging of " + el.getName() + " ended lol");
                     return false;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
                     // Log.d("JB", event.getX() + " " + event.getY());
-
                     if
                     (
                             // Acknowledges the limits of the screen
@@ -52,16 +53,16 @@ public class EventListeners {
                             (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
                     )
                     {
-                        Log.d("Bounds", "Acceptable");
+                        // Log.d("Bounds", "Acceptable");
                     }
                     else {
-                        Log.d("Bounds", "Unacceptable");
+                        Toast.makeText(activity, el.getName() + " is out of bounds, reverting to its original position", Toast.LENGTH_SHORT).show();
                     }
 
                     return false;
 
                 case DragEvent.ACTION_DROP:
-                    Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
+                    // Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
 
                     // Error, when you drop outside of the main layout, the element disappears.
                     // This issue has been fixed, the element shadow returns to the original position
@@ -103,8 +104,6 @@ public class EventListeners {
             el.reCalculateCoord();
             el.setVisibility(View.VISIBLE);
 
-            // Very untidy, this unreliable check sees to it that an element will not turn into another
-            // compound from the same
             activity.interactions.updateElementInList(el);
         }
     };

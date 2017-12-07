@@ -5,5 +5,11 @@ public enum ElementGroup {
     
     HYDROGEN,
     ALKALIMETALS,
+    // Stuff like magnesium
+    ALKALINEEARTHMETALS,
+    // Things like Nitrogen
+    PNICTOGENS,
+    // Things like oxygen
+    CHALCOGENS,
     HALOGENS
 }

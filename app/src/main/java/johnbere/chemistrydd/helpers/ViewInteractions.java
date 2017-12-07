@@ -1,7 +1,6 @@
 package johnbere.chemistrydd.helpers;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -61,6 +60,8 @@ public class ViewInteractions {
                 (el.getRect().intersect(element.getRect()))
             )
             {
+                activity.pop.start();
+                activity.vibr.vibrate(500);
                 this.reactElements(el, element);
                 break;
             }
@@ -76,8 +77,8 @@ public class ViewInteractions {
             )
             {
                 activity.buzzer.start();
-                activity.vibr.vibrate(1000);
-                Toast.makeText(activity, "That just won't do!", Toast.LENGTH_SHORT).show();
+                activity.vibr.vibrate(3000);
+                Toast.makeText(activity, el.getName() + " & " + element.getName() + " cannot react!", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -86,8 +87,8 @@ public class ViewInteractions {
     void reactElements(Element firstElement, Element secondElement) {
         ArrayList<Element> reactants = new ArrayList<>();
 
-        Log.d("JB", "first element " + firstElement.getName());
-        Log.d("JB", "second element " + secondElement.getName());
+        //Log.d("JB", "first element " + firstElement.getName());
+        //Log.d("JB", "second element " + secondElement.getName());
 
         // Add the reactants to formulate a formula name
         reactants.add(firstElement);
@@ -101,6 +102,7 @@ public class ViewInteractions {
 
         // Instantiate a new compound, it will contain a list of the reacted elements.
         Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.GREEN, reactants);
+//        Toast.makeText(activity, compound.getName() + " was created!", Toast.LENGTH_SHORT).show();
         addCompoundToList(compound);
 
         // Make the parameters equivalent to the property of the view interactions observer
@@ -109,12 +111,9 @@ public class ViewInteractions {
 
         ViewGroup content = activity.findViewById(R.id.content_main);
 
-        Log.d("JB", "The new id of the compound is " + compound.getElementId());
+        //Log.d("JB", "The new id of the compound is " + compound.getElementId());
 
         compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
-
-        activity.pop.start();
-        activity.vibr.vibrate(500);
 
         content.addView(compound);
 
