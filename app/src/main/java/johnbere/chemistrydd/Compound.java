@@ -2,14 +2,9 @@ package johnbere.chemistrydd;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,7 +21,6 @@ public class Compound extends Element {
     private boolean splitFlag, hasSplit;
     private int originalShapeColor;
     private GestureDetector gestureDetector;
-
 
     public Compound(Context context, String name, String formula, float x, float y, int elementId, int color, ArrayList<Element> elements) {
         super(context, name, formula, x, y, elementId, color, null);
@@ -97,6 +91,7 @@ public class Compound extends Element {
         return this.splitFlag;
     }
 
+    // primes the compound for a split.
     public void setSplitFlag() {
 
         if (!this.splitFlag) {
@@ -112,6 +107,7 @@ public class Compound extends Element {
         this.invalidate();
     }
 
+    // checks to see if compound has split, before removing itself from the interactions class.
     public boolean hasCompoundSplit() {
         return this.hasSplit;
     }
@@ -133,6 +129,7 @@ public class Compound extends Element {
         return gestureDetector.onTouchEvent(event);
     }
 
+    // A compound needs to be double tapped to be primed for a split and eventual deletion from the activity layout.
     private GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDoubleTap(MotionEvent event) {

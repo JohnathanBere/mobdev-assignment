@@ -8,12 +8,9 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import johnbere.chemistrydd.helpers.ElementGroup;
 import johnbere.chemistrydd.helpers.EventListeners;
@@ -51,57 +48,44 @@ public class MainActivity extends AppCompatActivity {
         vibr = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         sensorListener.setOnShakeListener(new ShakeEventListener.OnShakeListener() {
+            ArrayList<Compound> splitCompounds = new ArrayList<>();
             /**
              * Figure out a way to gracefully delete compounds from the activity as well as remove it from the interactions class... :)
              */
             @Override
             public void onShake() {
                 iterateOverCompounds(interactions.getCompounds());
-                // primeCompoundsForDeletion();
+                if (splitCompounds.size() > 0) {
+                    deletePrimedCompounds();
+                }
             }
 
             void iterateOverCompounds(ArrayList<Compound> compounds) {
-                Iterator<Compound> compoundIterator = compounds.iterator();
-                while (compoundIterator.hasNext()) {
-                    Compound co = compoundIterator.next();
+                for (Compound co : compounds) {
                     co.triggerCompoundSplit();
-                    if (co.hasCompoundSplit())
-                    {
+                    if (co.hasCompoundSplit()) {
                         elementsInCompound(co.getElements(), co.getX(), co.getY());
                         content.removeView(co);
-                        int index = interactions.getCompounds().indexOf(co);
-                        interactions.getCompounds().set(index, co);
-                        // interactions.removeCompoundFromList(co);
+                        splitCompounds.add(co);
                     }
                 }
             }
 
-            void elementsInCompound (ArrayList<Element> elements, float x, float y) {
-                Iterator<Element> elementIterator = elements.iterator();
-
-                while (elementIterator.hasNext()) {
-                    Element el = elementIterator.next();
-
+            void elementsInCompound(ArrayList<Element> elements, float x, float y) {
+                for (Element el : elements) {
                     Element element = new Element(MainActivity.this, el.getName(), el.getFormula(), x, y, elementId++, el.getShapeColor(), el.getGroup());
                     element.setOnTouchListener(new EventListeners(MainActivity.this).ElementTouchListener);
                     content.addView(element);
                     interactions.addElementToList(element);
                 }
-
             }
 
-            void primeCompoundsForDeletion() {
-                Iterator<Compound> compoundsToDelete = interactions.getCompounds().iterator();
-
-                while (compoundsToDelete.hasNext()) {
-                    Compound co = compoundsToDelete.next();
-
-                    if (co.hasCompoundSplit())
-                        interactions.getCompounds().remove(co);
+            void deletePrimedCompounds() {
+                for (Compound decomposedCompound : splitCompounds) {
+                    interactions.removeCompoundFromList(decomposedCompound);
                 }
             }
         });
-
 
         availableElements.add(new Element(this, "Sodium", "Na",100, 1000, elementId++, Color.LTGRAY, ElementGroup.ALKALIMETALS));
         availableElements.add(new Element(this, "Chlorine", "Cl",400, 1000, elementId++, Color.BLUE, ElementGroup.HALOGENS));
