@@ -30,7 +30,7 @@ public class Compound extends Element {
         String form = "";
         String compoundName = "";
 
-        // Sort constituent elements by group
+        // Sort constituent elements by element group
         Collections.sort(elements, new Comparator<Element>() {
             @Override
             public int compare(Element element1, Element element2) {
@@ -143,12 +143,7 @@ public class Compound extends Element {
             return true;
         }
 
-        /**
-         * Todo
-         *
-         * When a compound is set to be split, shaking the phone will split the compound to its
-         * composing elements
-         */
+
         @Override
         public boolean onDown(MotionEvent event) {
             /**

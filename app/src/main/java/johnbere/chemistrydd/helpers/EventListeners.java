@@ -11,13 +11,8 @@ import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 
-// Just need to abstract away the event listeners to make the code a bit tidier
+// Class for the substantial events of the application
 public class EventListeners {
-    /**
-     * Todo
-     * If at all possible, perhaps create a super class that includes main activity,
-     * meaning that subclasses will factor in all activities.
-     */
     private BaseActivity activity;
 
     public EventListeners(BaseActivity activity) {
@@ -68,6 +63,8 @@ public class EventListeners {
                     if (event.getLocalState() instanceof Compound)
                         dropMargin = activity.getResources().getInteger(R.integer.co_dim);
 
+                    // Ensures that the dragged element shadow is not taken off-screen, losing its ability
+                    // to become visible again.
                     if
                     (
                         (event.getX() > view.getLeft() + dropMargin && event.getX() < view.getRight() - dropMargin) &&
@@ -91,6 +88,7 @@ public class EventListeners {
         }
 
         private void setShapeCoords(Element el, float new_x, float new_y) {
+            // sets the coordinates of the displaced element
             el.setX(new_x);
             el.setY(new_y);
             el.setSquareX((int)new_x);
@@ -100,6 +98,7 @@ public class EventListeners {
             el.reCalculateCoord();
             el.setVisibility(View.VISIBLE);
 
+            // updates the coordinates in the interactions list
             activity.interactions.updateElementInList(el);
         }
     };
@@ -108,12 +107,11 @@ public class EventListeners {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
             Element el = (Element)v;
-            // Checks if the axes of the touch points match the axes of an element's grid box. If it does, it should proceed to move
-            // that element
+            // Checks if the axes of the touch points are within the grid of an element
             if
             (
-                (event.getX() > el.getSquareX() - el.getSquareW() && event.getX() < el.getSquareX() + el.getSquareW()) &&
-                (event.getY() > el.getSquareY() - el.getSquareH() && event.getY() < el.getSquareY() + el.getSquareH())
+                (event.getX() > el.getRect().left && event.getX() < el.getRect().right) &&
+                (event.getY() > el.getRect().top && event.getY() < el.getRect().bottom)
             )
             {
                 el.handleTouch(v, event);
@@ -125,7 +123,7 @@ public class EventListeners {
     public ShakeEventListener.OnShakeListener OnShakeListener = new ShakeEventListener.OnShakeListener() {
         ArrayList<Compound> splitCompounds = new ArrayList<>();
         /**
-         * Figure out a way to gracefully delete compounds from the activity as well as remove it from the interactions class... :)
+         * This handles the deletion of compounds from the interactions class for an activity.
          */
         @Override
         public void onShake() {
@@ -143,12 +141,13 @@ public class EventListeners {
                     activity.pop.start();
                     activity.vibr.vibrate(500);
                 }
-
                 deletePrimedCompounds();
             }
+            // the collection should be empty after a shake has occurred.
             splitCompounds.clear();
         }
 
+        // Compounds primed for a split will be added to the split collection for deletion
         void iterateOverCompounds(ArrayList<Compound> compounds) {
             for (Compound co : compounds) {
                 co.triggerCompoundSplit();
@@ -162,6 +161,7 @@ public class EventListeners {
             }
         }
 
+        // Reintroduces constituent elements of a compound to the view.
         void elementsInCompound(ArrayList<Element> elements, float x, float y) {
             int margin = activity.getResources().getInteger(R.integer.el_dim);
 

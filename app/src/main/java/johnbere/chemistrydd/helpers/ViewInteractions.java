@@ -34,13 +34,9 @@ public class ViewInteractions {
      *
      * What I have:
      * The ability to check for the elements in-memory. Adjusting their axes on the fly.
-     * I want to now be able to detect the presence of another element within 5-10 pixels among one another.
-     * So if it was dropped near another element, they should combine (both disappearing) and re-appearing as
+     * Displaced elements that intersect should respond by checking if they will react or not.
+     * So if it was dropped near another element, and they can react they should combine (both disappearing) and re-appearing as
      * another 'compound'
-     *
-     * Todo
-     * [x] Rename elements to reactant (as not only elements can form a compound, compounds can as well)
-     * Need to create a check to see whether an element or compound is one of the reactants.
      */
     void findNearbyElements(View param) {
         Element el = (Element)param;

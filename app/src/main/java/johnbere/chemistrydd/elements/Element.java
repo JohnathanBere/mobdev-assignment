@@ -14,11 +14,7 @@ import johnbere.chemistrydd.helpers.*;
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
 /**
- * This class is a game object, that can be dragged and dropped
- * Todo
- * 1. If needed, begin subclassing this view, namely for combinations of availableElements
- * 2. Add other properties like element type, group etc.
- * 3. Proceed to add instances of this class to an ArrayAdapter class (written somewhere else)
+ * This class is a game object, that can be dragged and dropped. It has its own touch handle, that triggers a drag event.
  */
 public class Element extends View {
     // Set basic information about the element such as its name and formula
@@ -98,7 +94,7 @@ public class Element extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // Set the colors
-        rectColor.setColor(Color.RED);
+        rectColor.setColor(Color.TRANSPARENT);
         formulaColor.setColor(Color.WHITE);
         shapeColor.setColor(color);
         formulaColor.setTextSize(60);
