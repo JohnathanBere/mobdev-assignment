@@ -5,6 +5,6 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="johnbere.chemistrydd.MainActivity">
+    tools:context="johnbere.chemistrydd.activities.MainActivity">
 
 </android.support.constraint.ConstraintLayout>

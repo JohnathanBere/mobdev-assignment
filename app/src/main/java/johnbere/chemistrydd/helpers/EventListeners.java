@@ -3,14 +3,12 @@ package johnbere.chemistrydd.helpers;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import johnbere.chemistrydd.BaseActivity;
-import johnbere.chemistrydd.Compound;
-import johnbere.chemistrydd.Element;
-import johnbere.chemistrydd.MainActivity;
+import johnbere.chemistrydd.activities.base.BaseActivity;
+import johnbere.chemistrydd.elements.Compound;
+import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 
 // Just need to abstract away the event listeners to make the code a bit tidier

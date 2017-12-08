@@ -1,10 +1,9 @@
-package johnbere.chemistrydd;
+package johnbere.chemistrydd.elements;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;

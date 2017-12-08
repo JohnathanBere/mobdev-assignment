@@ -3,4 +3,6 @@
     <!-- The dimensions of the element and compounds will ensure proper alignment and drop margins are sorted -->
     <integer name="el_dim">80</integer>
     <integer name="co_dim">160</integer>
+    <integer name="list_start_x">240</integer>
+    <integer name="list_start_y">1400</integer>
 </resources>

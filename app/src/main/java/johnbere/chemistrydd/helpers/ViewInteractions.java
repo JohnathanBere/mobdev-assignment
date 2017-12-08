@@ -6,10 +6,9 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import johnbere.chemistrydd.BaseActivity;
-import johnbere.chemistrydd.Compound;
-import johnbere.chemistrydd.Element;
-import johnbere.chemistrydd.MainActivity;
+import johnbere.chemistrydd.activities.base.BaseActivity;
+import johnbere.chemistrydd.elements.Compound;
+import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 
 

@@ -1,4 +1,4 @@
-package johnbere.chemistrydd;
+package johnbere.chemistrydd.elements;
 
 import android.content.ClipData;
 import android.content.Context;
