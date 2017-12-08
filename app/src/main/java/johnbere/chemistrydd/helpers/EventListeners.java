@@ -5,6 +5,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
+import johnbere.chemistrydd.BaseActivity;
 import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
@@ -17,9 +20,9 @@ public class EventListeners {
      * If at all possible, perhaps create a super class that includes main activity,
      * meaning that subclasses will factor in all activities.
      */
-    private MainActivity activity;
+    private BaseActivity activity;
 
-    public EventListeners(MainActivity activity) {
+    public EventListeners(BaseActivity activity) {
         this.activity = activity;
     }
 
@@ -118,6 +121,84 @@ public class EventListeners {
                 el.handleTouch(v, event);
             }
             return false;
+        }
+    };
+
+    public ShakeEventListener.OnShakeListener OnShakeListener = new ShakeEventListener.OnShakeListener() {
+        ArrayList<Compound> splitCompounds = new ArrayList<>();
+        /**
+         * Figure out a way to gracefully delete compounds from the activity as well as remove it from the interactions class... :)
+         */
+        @Override
+        public void onShake() {
+            iterateOverCompounds(activity.interactions.getCompounds());
+            // The interactions class should proceed to remove any compound that has been split
+            // from its observation
+            if (splitCompounds.size() > 0) {
+                // If at least 2 or more compounds were split a bang sound should be made
+                if (splitCompounds.size() >= 2) {
+                    activity.bang.start();
+                    activity.vibr.vibrate(3000);
+                }
+                // other wise just another pop
+                else if (splitCompounds.size() < 2) {
+                    activity.pop.start();
+                    activity.vibr.vibrate(500);
+                }
+
+                deletePrimedCompounds();
+            }
+            splitCompounds.clear();
+        }
+
+        void iterateOverCompounds(ArrayList<Compound> compounds) {
+            for (Compound co : compounds) {
+                co.triggerCompoundSplit();
+                if (co.hasCompoundSplit()) {
+                    elementsInCompound(co.getElements(), co.getX(), co.getY());
+                    activity.content.removeView(co);
+                    activity.pop.start();
+                    activity.vibr.vibrate(500);
+                    splitCompounds.add(co);
+                }
+            }
+        }
+
+        void elementsInCompound(ArrayList<Element> elements, float x, float y) {
+            int margin = activity.getResources().getInteger(R.integer.el_dim);
+
+            for (Element el : elements) {
+                Element element = new Element(activity, el.getName(), el.getFormula(), x, y, activity.elementId++, el.getShapeColor(), el.getGroup());
+                int currentIndex = elements.indexOf(el);
+
+                if (currentIndex > 0) {
+                    // Places the element in the array in a place relative to the previous element
+                    int x_multiply = currentIndex * element.getSquareW();
+                    // setting it right
+                    if (x > activity.content.getLeft() + margin && x < activity.content.getWidth() / 2) {
+                        element.setX(x + x_multiply);
+                        element.setSquareX((int)(x + x_multiply));
+                        element.reCalculateCoord();
+                    }
+                    // or setting it left
+                    else if (x < activity.content.getRight() - margin && x > activity.content.getWidth() / 2) {
+                        element.setX(x - x_multiply);
+                        element.setSquareX((int)(x - x_multiply));
+                        element.reCalculateCoord();
+                    }
+                }
+
+                element.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
+                activity.content.addView(element);
+                activity.interactions.addElementToList(element);
+            }
+        }
+
+        // Finds out which compounds were split and should be removed from the interactions compound collection.
+        void deletePrimedCompounds() {
+            for (Compound decomposedCompound : splitCompounds) {
+                activity.interactions.removeCompoundFromList(decomposedCompound);
+            }
         }
     };
 }

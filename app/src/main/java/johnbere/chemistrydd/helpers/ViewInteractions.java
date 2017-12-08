@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import johnbere.chemistrydd.BaseActivity;
 import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
@@ -18,11 +19,11 @@ import johnbere.chemistrydd.R;
 public class ViewInteractions {
     private ArrayList<Element> elements;
     private ArrayList<Compound> compounds;
-    private MainActivity activity;
+    private BaseActivity activity;
     private int incr;
     private Element element1, element2;
 
-    public ViewInteractions(MainActivity activity) {
+    public ViewInteractions(BaseActivity activity) {
         this.activity = activity;
         this.compounds = new ArrayList<>();
         this.element1 = null;
