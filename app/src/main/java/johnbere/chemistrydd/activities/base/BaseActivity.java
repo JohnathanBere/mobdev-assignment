@@ -6,7 +6,6 @@ import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
@@ -30,13 +29,31 @@ public abstract class BaseActivity extends AppCompatActivity {
     public ArrayList<Element> availableElements = new ArrayList<>();
     public ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ViewInteractions interactions = new ViewInteractions(this);
-    public int elementId = 0;
-    public int list_start_x;
-    public int list_start_y;
-    public int el_margin;
+    public int
+            elementId = 0,
+            list_start_x,
+            list_start_y,
+            el_margin,
+            el_width,
+            co_width,
+            numberOfAttempts = 0,
+            attemptLimits = 0;
+
+    // Abstract methods that will be overridden by the sub-classes
+    // Ensuring consistency with the helper classes the require activities of type
+    // BaseActivity for proper functionality
+    protected abstract int getResourceLayoutId();
+    protected abstract int getContentLayoutId();
+    protected abstract Context getCurrentContext();
+    protected abstract void addElementsToLists();
+
+    protected void onActivityStart() {
+        addElementsToLists();
+        elementFactory();
+    }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getResourceLayoutId());
         content = findViewById(getContentLayoutId());
@@ -44,7 +61,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         list_start_x = getResources().getInteger(R.integer.list_start_x);
         list_start_y = getResources().getInteger(R.integer.list_start_y);
+
         el_margin = getResources().getInteger(R.integer.el_margin);
+        el_width = getResources().getInteger(R.integer.el_width);
+        co_width = getResources().getInteger(R.integer.co_width);
 
         pop = MediaPlayer.create(context, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(context, R.raw.hypocore__buzzer);
@@ -54,6 +74,54 @@ public abstract class BaseActivity extends AppCompatActivity {
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         sensorListener = new ShakeEventListener();
         sensorListener.setOnShakeListener(new EventListeners(this).OnShakeListener);
+
+        // Proceed to add the items to the array and then display on the view.
+        onActivityStart();
+    }
+
+    protected void elementFactory() {
+        // The helper class should now observe the elements
+        interactions.setElements(availableElements);
+        interactions.setCompounds(availableCompounds);
+
+        // Sets the value of the incrementor to assign a proper elementId to a newly added compound
+        elementId = availableElements.size() + availableCompounds.size();
+        interactions.setIncr(elementId);
+
+        // Sets the event listener before appending this programmatically to the view.
+        // The logic for looping through the data structures may be stored as methods
+        // in the base class and then be called.
+        for (Element el : availableElements) {
+            el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+            content.addView(el);
+        }
+        for (Compound co : availableCompounds) {
+            co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+            content.addView(co);
+        }
+
+        content.setOnDragListener(new EventListeners(this).LayoutDragListener);
+    }
+
+    protected int getPositionOffset(int width) {
+        return width + el_margin;
+    }
+
+    // Run this when you are ready to start a new activity... Finishing the former one.
+    // REMEMBER TO KEEP SCORE AND TOTAL TIME
+    protected void cleanseInputData() {
+        interactions.getElements().clear();
+        interactions.getCompounds().clear();
+        interactions.setIncr(0);
+        elementId = 0;
+        availableCompounds.clear();
+        availableElements.clear();
+    }
+
+    // If the user chooses to reset their activity, reruns the process from scratch again.
+    protected void resetActivity() {
+        cleanseInputData();
+        onActivityStart();
     }
 
     @Override
@@ -69,39 +137,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onPause();
         sensorManager.unregisterListener(sensorListener);
     }
-
-    // Run this when you are ready to start a new activity... Finishing the former one.
-    // REMEMBER TO KEEP SCORE AND TOTAL TIME
-    protected void cleanseInputData() {
-        interactions.getElements().clear();
-        interactions.getCompounds().clear();
-        interactions.setIncr(0);
-        availableCompounds.clear();
-        availableElements.clear();
-    }
-
-    protected void elementFactory() {
-        // The helper class should now observe the elements
-        interactions.setElements(availableElements);
-        interactions.setIncr(availableElements.size());
-
-        // Sets the event listener before appending this programmatically to the view.
-        // The logic for looping through the data structures may be stored as methods
-        // in the base class and then be called.
-        for (Element el : availableElements) {
-            el.setTag(el.getName());
-            el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
-            content.addView(el);
-        }
-        for (Compound co : availableCompounds) {
-            co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
-            content.addView(co);
-        }
-        content.setOnDragListener(new EventListeners(this).LayoutDragListener);
-    }
-
-    protected abstract int getResourceLayoutId();
-    protected abstract int getContentLayoutId();
-    protected abstract Context getCurrentContext();
-    protected abstract void addElementsToLists();
 }

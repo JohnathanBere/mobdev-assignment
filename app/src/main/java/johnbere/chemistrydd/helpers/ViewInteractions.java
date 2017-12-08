@@ -38,7 +38,7 @@ public class ViewInteractions {
      * So if it was dropped near another element, and they can react they should combine (both disappearing) and re-appearing as
      * another 'compound'
      */
-    void findNearbyElements(View param) {
+    private void findNearbyElements(View param) {
         Element el = (Element)param;
         for (Element element : this.elements) {
             // check if an element that isn't the same as what's on the parameter, is nearby
@@ -79,7 +79,7 @@ public class ViewInteractions {
         }
     }
 
-    void reactElements(Element firstElement, Element secondElement) {
+    private void reactElements(Element firstElement, Element secondElement) {
         ArrayList<Element> reactants = new ArrayList<>();
         final int compoundMargins = activity.getResources().getInteger(R.integer.co_dim);
 
@@ -91,7 +91,9 @@ public class ViewInteractions {
         firstElement.setVisibility(View.INVISIBLE);
         secondElement.setVisibility(View.INVISIBLE);
 
+        // Increment the incrementor, and assign the elementId index to equal that
         this.incr++;
+        activity.elementId = incr;
 
         // Instantiate a new compound, it will contain a list of the reacted elements.
         Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.GREEN, reactants);
@@ -143,9 +145,8 @@ public class ViewInteractions {
 
     /**
      * Updates the element in a list
-     * @param param
      */
-    public void updateElementInList(View param) {
+    void updateElementInList(View param) {
         Element castEl = (Element)param;
         for (Element element : this.elements) {
             // add this to the if statement otherwise el.getName().equals(element.getName())
