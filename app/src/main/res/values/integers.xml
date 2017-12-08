@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The dimensions of the element and compounds will ensure proper alignment and drop margins are sorted -->
+    <integer name="el_dim">80</integer>
+    <integer name="co_dim">160</integer>
+</resources>

@@ -5,8 +5,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import johnbere.chemistrydd.Compound;
 import johnbere.chemistrydd.Element;
 import johnbere.chemistrydd.MainActivity;
+import johnbere.chemistrydd.R;
 
 // Just need to abstract away the event listeners to make the code a bit tidier
 public class EventListeners {
@@ -27,6 +29,9 @@ public class EventListeners {
             int action = event.getAction();
             Element el = (Element)event.getLocalState();
 
+            // Ensures that the shadow is not dragged away from view.
+            int dropMargin = activity.getResources().getInteger(R.integer.el_dim);
+
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     //Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
@@ -37,7 +42,7 @@ public class EventListeners {
                 // Set the dragged element to being invisible when the dragging has been initiated
                 case DragEvent.ACTION_DRAG_ENTERED:
                     el.setVisibility(View.INVISIBLE);
-                    Toast.makeText(activity, "Dragging " + el.getName(), Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(activity, "Dragging " + el.getName(), Toast.LENGTH_SHORT).show();
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
@@ -45,20 +50,6 @@ public class EventListeners {
                     return false;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
-                    // Log.d("JB", event.getX() + " " + event.getY());
-                    if
-                    (
-                            // Acknowledges the limits of the screen
-                            (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
-                            (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
-                    )
-                    {
-                        // Log.d("Bounds", "Acceptable");
-                    }
-                    else {
-                        Toast.makeText(activity, el.getName() + " is out of bounds, reverting to its original position", Toast.LENGTH_SHORT).show();
-                    }
-
                     return false;
 
                 case DragEvent.ACTION_DROP:
@@ -72,10 +63,14 @@ public class EventListeners {
                     float prevX = el.getX();
                     float prevY = el.getY();
 
+                    // Double the margin if the dragged view is a compound
+                    if (event.getLocalState() instanceof Compound)
+                        dropMargin = activity.getResources().getInteger(R.integer.co_dim);
+
                     if
                     (
-                        (event.getX() > view.getLeft() + 80 && event.getX() < view.getRight() - 80) &&
-                        (event.getY() > view.getTop() + 80 && event.getY() < view.getBottom() - 80)
+                        (event.getX() > view.getLeft() + dropMargin && event.getX() < view.getRight() - dropMargin) &&
+                        (event.getY() > view.getTop() + dropMargin && event.getY() < view.getBottom() - dropMargin)
                     )
                     {
                         setShapeCoords(el, new_x, new_y);

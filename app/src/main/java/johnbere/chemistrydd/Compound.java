@@ -70,7 +70,7 @@ public class Compound extends Element {
 
     public void triggerCompoundSplit() {
         if (this.splitFlag) {
-            Toast.makeText(getContext(), this.getName() + " is splitting", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), this.getName() + " is splitting", Toast.LENGTH_SHORT).show();
             this.splitToConstituents();
         }
     }
@@ -85,7 +85,7 @@ public class Compound extends Element {
             else
                 str += el.getName();
         }
-        Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getContext(), str, Toast.LENGTH_SHORT).show();
         this.hasSplit = true;
     }
 
@@ -140,7 +140,7 @@ public class Compound extends Element {
         public boolean onDoubleTap(MotionEvent event) {
             setSplitFlag();
             String message = getSplitFlag() ? " is marked to split" : " is not going to split";
-            Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
             return true;
         }
 

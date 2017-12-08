@@ -3,7 +3,6 @@ package johnbere.chemistrydd.helpers;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -78,7 +77,7 @@ public class ViewInteractions {
             {
                 activity.buzzer.start();
                 activity.vibr.vibrate(3000);
-                Toast.makeText(activity, el.getName() + " & " + element.getName() + " cannot react!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(activity, el.getName() + " & " + element.getName() + " cannot react!", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
@@ -86,9 +85,7 @@ public class ViewInteractions {
 
     void reactElements(Element firstElement, Element secondElement) {
         ArrayList<Element> reactants = new ArrayList<>();
-
-        //Log.d("JB", "first element " + firstElement.getName());
-        //Log.d("JB", "second element " + secondElement.getName());
+        final int compoundMargins = activity.getResources().getInteger(R.integer.co_dim);
 
         // Add the reactants to formulate a formula name
         reactants.add(firstElement);
@@ -103,6 +100,32 @@ public class ViewInteractions {
         // Instantiate a new compound, it will contain a list of the reacted elements.
         Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.GREEN, reactants);
 //        Toast.makeText(activity, compound.getName() + " was created!", Toast.LENGTH_SHORT).show();
+
+
+        // Properly align the compound to its minimum confines as to not appear clipped when it has been created.
+        if (compound.getX() < activity.content.getLeft() + compoundMargins) {
+            compound.setX(compoundMargins);
+            compound.setSquareX(compoundMargins);
+            compound.reCalculateCoord();
+        }
+        else if (compound.getX() > activity.content.getRight() - compoundMargins) {
+            int rightLimit = activity.content.getRight() - compoundMargins;
+            compound.setX(rightLimit);
+            compound.setSquareX(rightLimit);
+            compound.reCalculateCoord();
+        }
+        if (compound.getY() < activity.content.getTop() + compoundMargins) {
+            compound.setY(compoundMargins);
+            compound.setSquareY(compoundMargins);
+            compound.reCalculateCoord();
+        }
+        else if (compound.getY() > activity.content.getBottom() - compoundMargins) {
+            int bottomLimit = activity.content.getBottom() - compoundMargins;
+            compound.setY(bottomLimit);
+            compound.setSquareY(bottomLimit);
+            compound.reCalculateCoord();
+        }
+
         addCompoundToList(compound);
 
         // Make the parameters equivalent to the property of the view interactions observer

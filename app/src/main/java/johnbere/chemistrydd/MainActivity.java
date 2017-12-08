@@ -8,9 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Element> availableElements = new ArrayList<>();
     ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ViewInteractions interactions = new ViewInteractions(this);
-    ViewGroup content;
+    public ViewGroup content;
     public MediaPlayer pop, buzzer, bang;
     SensorManager sensorManager;
     private ShakeEventListener sensorListener;
@@ -75,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                     deletePrimedCompounds();
                 }
                 splitCompounds.clear();
-                Toast.makeText(MainActivity.this, "Number of compounds to split: " + splitCompounds.size(), Toast.LENGTH_SHORT).show();
             }
 
             void iterateOverCompounds(ArrayList<Compound> compounds) {
@@ -92,13 +89,29 @@ public class MainActivity extends AppCompatActivity {
             }
 
             void elementsInCompound(ArrayList<Element> elements, float x, float y) {
+                int margin = getResources().getInteger(R.integer.el_dim);
+
                 for (Element el : elements) {
                     Element element = new Element(MainActivity.this, el.getName(), el.getFormula(), x, y, elementId++, el.getShapeColor(), el.getGroup());
-                    if (elements.indexOf(el) == elements.size()) {
-                        // keep the elements separate
-                        // el.setX()
-                        // el.setY()
+                    int currentIndex = elements.indexOf(el);
+
+                    if (currentIndex > 0) {
+                        // Places the element in the array in a place relative to the previous element
+                        int x_multiply = currentIndex * element.getSquareW();
+                        // setting it right
+                        if (x > content.getLeft() + margin && x < content.getWidth() / 2) {
+                            element.setX(x + x_multiply);
+                            element.setSquareX((int)(x + x_multiply));
+                            element.reCalculateCoord();
+                        }
+                        // or setting it left
+                        else if (x < content.getRight() - margin && x > content.getWidth() / 2) {
+                            element.setX(x - x_multiply);
+                            element.setSquareX((int)(x - x_multiply));
+                            element.reCalculateCoord();
+                        }
                     }
+
                     element.setOnTouchListener(new EventListeners(MainActivity.this).ElementTouchListener);
                     content.addView(element);
                     interactions.addElementToList(element);
