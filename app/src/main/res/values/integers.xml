@@ -5,4 +5,5 @@
     <integer name="co_dim">160</integer>
     <integer name="list_start_x">240</integer>
     <integer name="list_start_y">1400</integer>
+    <integer name="el_margin">40</integer>
 </resources>

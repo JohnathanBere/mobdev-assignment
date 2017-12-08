@@ -33,6 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public int elementId = 0;
     public int list_start_x;
     public int list_start_y;
+    public int el_margin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,6 +44,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         list_start_x = getResources().getInteger(R.integer.list_start_x);
         list_start_y = getResources().getInteger(R.integer.list_start_y);
+        el_margin = getResources().getInteger(R.integer.el_margin);
 
         pop = MediaPlayer.create(context, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(context, R.raw.hypocore__buzzer);

@@ -98,7 +98,7 @@ public class Element extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // Set the colors
-        rectColor.setColor(Color.TRANSPARENT);
+        rectColor.setColor(Color.RED);
         formulaColor.setColor(Color.WHITE);
         shapeColor.setColor(color);
         formulaColor.setTextSize(60);
