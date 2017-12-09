@@ -130,17 +130,15 @@ public class ViewInteractions {
         this.element1 = firstElement;
         this.element2 = secondElement;
 
-        ViewGroup content = activity.findViewById(R.id.content_main);
-
         //Log.d("JB", "The new id of the compound is " + compound.getElementId());
 
         compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
 
-        content.addView(compound);
+        activity.content.addView(compound);
 
         // Remove the reacted elements from the view
-        content.removeView(firstElement);
-        content.removeView(secondElement);
+        activity.content.removeView(firstElement);
+        activity.content.removeView(secondElement);
     }
 
     /**
@@ -203,5 +201,9 @@ public class ViewInteractions {
 
     public void setIncr (int incr) {
         this.incr = incr;
+    }
+
+    public BaseActivity getActivity() {
+        return this.activity;
     }
 }

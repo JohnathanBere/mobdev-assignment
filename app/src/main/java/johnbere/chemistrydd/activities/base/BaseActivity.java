@@ -1,12 +1,14 @@
 package johnbere.chemistrydd.activities.base;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ import johnbere.chemistrydd.helpers.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
 
 public abstract class BaseActivity extends AppCompatActivity {
-    private SensorManager sensorManager;
-    private ShakeEventListener sensorListener;
+    public SensorManager sensorManager;
+    public ShakeEventListener sensorListener;
 
     public Context context;
     public ViewGroup content;
@@ -28,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Vibrator vibr;
     public ArrayList<Element> availableElements = new ArrayList<>();
     public ArrayList<Compound> availableCompounds = new ArrayList<>();
-    public ViewInteractions interactions = new ViewInteractions(this);
+    public ViewInteractions interactions;
     public int
             elementId = 0,
             list_start_x,
@@ -75,8 +77,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         sensorListener = new ShakeEventListener();
         sensorListener.setOnShakeListener(new EventListeners(this).OnShakeListener);
 
+        interactions = new ViewInteractions(this);
+
         // Proceed to add the items to the array and then display on the view.
         onActivityStart();
+    }
+
+    protected void moveToNextActivity(BaseActivity nextActivity) {
+        BaseActivity currentActivity = (BaseActivity)getCurrentContext();
+        Intent i = new Intent(currentActivity, nextActivity.getClass());
+        startActivity(i);
     }
 
     protected void elementFactory() {
@@ -91,13 +101,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Sets the event listener before appending this programmatically to the view.
         // The logic for looping through the data structures may be stored as methods
         // in the base class and then be called.
-        for (Element el : availableElements) {
-            el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
-            content.addView(el);
+        if (availableElements.size() > 0) {
+            for (Element el : availableElements) {
+                el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+                content.addView(el);
+            }
         }
-        for (Compound co : availableCompounds) {
-            co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
-            content.addView(co);
+
+        if (availableCompounds.size() > 0) {
+            for (Compound co : availableCompounds) {
+                co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+                content.addView(co);
+            }
         }
 
         content.setOnDragListener(new EventListeners(this).LayoutDragListener);

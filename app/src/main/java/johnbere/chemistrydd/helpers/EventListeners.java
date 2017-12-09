@@ -19,6 +19,10 @@ public class EventListeners {
         this.activity = activity;
     }
 
+    public BaseActivity getActivity() {
+        return this.activity;
+    }
+
     public View.OnDragListener LayoutDragListener = new View.OnDragListener() {
         @Override
         public boolean onDrag(View view, DragEvent event) {
