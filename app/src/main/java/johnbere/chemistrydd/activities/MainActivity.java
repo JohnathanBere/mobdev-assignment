@@ -1,10 +1,7 @@
 package johnbere.chemistrydd.activities;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -23,6 +20,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 moveToNextActivity(new FirstQuestionActivity());
+                finish();
             }
         });
     }
@@ -44,4 +42,10 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void addElementsToLists() {}
+
+    @Override
+    protected void pushDataToNextActivity() {}
+
+    @Override
+    protected void getDataFromPreviousActivity() {}
 }

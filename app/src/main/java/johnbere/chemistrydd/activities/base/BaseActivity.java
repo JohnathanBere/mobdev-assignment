@@ -1,12 +1,14 @@
 package johnbere.chemistrydd.activities.base;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.helpers.EventListeners;
+import johnbere.chemistrydd.helpers.Resify;
 import johnbere.chemistrydd.helpers.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
 
@@ -31,6 +34,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     public ArrayList<Element> availableElements = new ArrayList<>();
     public ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ViewInteractions interactions;
+    public Intent intent;
+    public Resify resify;
     public int
             elementId = 0,
             list_start_x,
@@ -48,8 +53,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract int getContentLayoutId();
     protected abstract Context getCurrentContext();
     protected abstract void addElementsToLists();
+    protected abstract void pushDataToNextActivity();
+    protected abstract void getDataFromPreviousActivity();
 
     protected void onActivityStart() {
+        getDataFromPreviousActivity();
         addElementsToLists();
         elementFactory();
     }
@@ -58,15 +66,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getResourceLayoutId());
+
         content = findViewById(getContentLayoutId());
         context = getCurrentContext();
+        resify = new Resify(this);
 
-        list_start_x = getResources().getInteger(R.integer.list_start_x);
-        list_start_y = getResources().getInteger(R.integer.list_start_y);
+        list_start_x = resify.intResify(R.integer.list_start_x);
+        list_start_y = resify.intResify(R.integer.list_start_y);
 
-        el_margin = getResources().getInteger(R.integer.el_margin);
-        el_width = getResources().getInteger(R.integer.el_width);
-        co_width = getResources().getInteger(R.integer.co_width);
+        el_margin = resify.intResify(R.integer.el_margin);
+        el_width = resify.intResify(R.integer.el_width);
+        co_width = resify.intResify(R.integer.co_width);
+
 
         pop = MediaPlayer.create(context, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(context, R.raw.hypocore__buzzer);
@@ -84,9 +95,17 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void moveToNextActivity(BaseActivity nextActivity) {
+        // Gets a sub class of the current activity
         BaseActivity currentActivity = (BaseActivity)getCurrentContext();
-        Intent i = new Intent(currentActivity, nextActivity.getClass());
-        startActivity(i);
+        // Creates a new intent based on the parameterised desired next
+        intent = new Intent(currentActivity, nextActivity.getClass());
+
+        // Overrideable method to put extra things in the form of i.putExtra
+        pushDataToNextActivity();
+        //
+
+
+        startActivity(intent);
     }
 
     protected void elementFactory() {
@@ -137,6 +156,21 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void resetActivity() {
         cleanseInputData();
         onActivityStart();
+    }
+
+    // Asks if the user is sure about wanting to close the app
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage(getResources().getString(R.string.close_message))
+                .setPositiveButton(resify.stringResify(R.string.yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        BaseActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton(resify.stringResify(R.string.no), null)
+                .show();
     }
 
     @Override

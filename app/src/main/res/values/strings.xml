@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ChemistryDD</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="close_message">Are you sure you want to close? All progress will be lost.</string>
 </resources>
