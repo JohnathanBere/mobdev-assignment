@@ -13,13 +13,16 @@ public class MainActivity extends BaseActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
+    @Override
+    protected void viewActivityBindings() {
         startBtn = findViewById(R.id.startBtn);
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToNextActivity(new FirstQuestionActivity());
+                moveToNextActivity(new Difficulty());
                 finish();
             }
         });
@@ -36,6 +39,11 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected int getTimerText() {
+        return 0;
+    }
+
+    @Override
     protected Context getCurrentContext() {
         return MainActivity.this;
     }
@@ -48,4 +56,14 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void getDataFromPreviousActivity() {}
+
+    @Override
+    protected int getAttemptLimitText() {
+        return 0;
+    }
+
+    @Override
+    protected int getScoreText() {
+        return 0;
+    }
 }

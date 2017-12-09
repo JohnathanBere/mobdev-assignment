@@ -2,55 +2,58 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/first_question"
+    android:id="@+id/second_question"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="johnbere.chemistrydd.activities.FirstQuestion"
+    tools:context="johnbere.chemistrydd.activities.SecondQuestion"
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
-        android:id="@+id/q1Txt"
+        android:id="@+id/q2Txt"
         android:layout_width="219dp"
         android:layout_height="32dp"
         android:layout_marginBottom="449dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginStart="20dp"
         android:text="TextView"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/q1Info"
-        app:layout_constraintEnd_toStartOf="@+id/q1Timer"
-        app:layout_constraintStart_toEndOf="@+id/q1Attempts" />
+        app:layout_constraintBottom_toTopOf="@+id/q2Info"
+        app:layout_constraintEnd_toStartOf="@+id/q2Timer"
+        app:layout_constraintStart_toEndOf="@+id/q2Attempts"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/q1Timer"
+        android:id="@+id/q2Timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="449dp"
         android:text="10"
         android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/q2Btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/q1Attempts"
+        android:id="@+id/q2Attempts"
         android:layout_width="90dp"
         android:layout_height="23dp"
+        android:layout_marginBottom="458dp"
         android:text="Attempts:"
+        app:layout_constraintBottom_toTopOf="@+id/q2Reset"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/q1Reset"
+        android:id="@+id/q2Reset"
         android:layout_width="55dp"
         android:layout_height="30dp"
-        android:layout_marginTop="458dp"
         android:text="Reset"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/q1Attempts" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/q1Info"
+        android:id="@+id/q2Info"
         android:layout_width="55dp"
         android:layout_height="30dp"
         android:layout_marginEnd="109dp"
@@ -58,18 +61,15 @@
         android:text="Help"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/q1btn"
-        app:layout_constraintStart_toEndOf="@+id/q1Reset" />
+        app:layout_constraintEnd_toStartOf="@+id/q2Btn"
+        app:layout_constraintStart_toEndOf="@+id/q2Reset" />
 
     <Button
-        android:id="@+id/q1btn"
+        android:id="@+id/q2Btn"
         android:layout_width="55dp"
         android:layout_height="30dp"
-        android:layout_marginTop="449dp"
         android:text="Submit"
         android:textSize="8sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/q1Timer" />
-
+        app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

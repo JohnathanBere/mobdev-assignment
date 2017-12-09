@@ -20,7 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.FirstQuestionActivity"></activity>
+        <activity android:name=".activities.FirstQuestion" />
+        <activity android:name=".activities.SecondQuestion" />
+        <activity android:name=".activities.Difficulty"></activity>
     </application>
 
 </manifest>

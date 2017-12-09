@@ -7,11 +7,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -19,10 +21,13 @@ import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.helpers.EventListeners;
+import johnbere.chemistrydd.helpers.Game;
 import johnbere.chemistrydd.helpers.Resify;
 import johnbere.chemistrydd.helpers.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
 
+// use a difficulty setting (Before the first question) that determines the time taken and attempts made
+// determining the scores a user gets
 public abstract class BaseActivity extends AppCompatActivity {
     public SensorManager sensorManager;
     public ShakeEventListener sensorListener;
@@ -35,7 +40,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     public ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ViewInteractions interactions;
     public Intent intent;
+    public Game difficulty;
     public Resify resify;
+    public CountDownTimer timer;
+    long totalTime;
     public int
             elementId = 0,
             list_start_x,
@@ -44,20 +52,36 @@ public abstract class BaseActivity extends AppCompatActivity {
             el_width,
             co_width,
             numberOfAttempts = 0,
-            attemptLimits = 0;
+            attemptLimit = 0;
 
     // Abstract methods that will be overridden by the sub-classes
     // Ensuring consistency with the helper classes the require activities of type
     // BaseActivity for proper functionality
     protected abstract int getResourceLayoutId();
     protected abstract int getContentLayoutId();
+    protected abstract int getTimerText();
+    protected abstract int getAttemptLimitText();
+    protected abstract int getScoreText();
     protected abstract Context getCurrentContext();
     protected abstract void addElementsToLists();
     protected abstract void pushDataToNextActivity();
     protected abstract void getDataFromPreviousActivity();
+    protected abstract void viewActivityBindings();
+
+    /**
+     * Todo:
+     * Create an abstract method that sets up the desired compounds / elements
+     * Create a method here that evaluates if the current compounds / elements match the desired outcome
+     * Also, the result screen should trigger at different times: When time has run out, when the number have attempts
+     * have reached max, and when the desired outcome has been achieved. If the former have occurred, a user either gets some
+     * points for what they got correct or no points at all.
+     *
+     * The less attempts a user has had, the higher the amount of points they get
+     *
+     * Create either another quiz activity or a results page that grades the user performance based on the amount of points.
+     */
 
     protected void onActivityStart() {
-        getDataFromPreviousActivity();
         addElementsToLists();
         elementFactory();
     }
@@ -69,6 +93,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         content = findViewById(getContentLayoutId());
         context = getCurrentContext();
+
         resify = new Resify(this);
 
         list_start_x = resify.intResify(R.integer.list_start_x);
@@ -77,7 +102,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         el_margin = resify.intResify(R.integer.el_margin);
         el_width = resify.intResify(R.integer.el_width);
         co_width = resify.intResify(R.integer.co_width);
-
 
         pop = MediaPlayer.create(context, R.raw.deraj_pop);
         buzzer = MediaPlayer.create(context, R.raw.hypocore__buzzer);
@@ -90,8 +114,24 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         interactions = new ViewInteractions(this);
 
+        // Gets existing data from a previous intent if there is any
+        getDataFromPreviousActivity();
+
+        // Binds the activity to views widgets exclusive to that activity
+        viewActivityBindings();
+
+        // default time
+        totalTime = 11000;
+        attemptLimit = 5;
+
+        // Depending on the difficulty, attempts and time are
+        difficultySettings();
+
         // Proceed to add the items to the array and then display on the view.
         onActivityStart();
+
+        // Sets the timer, depending on difficulty however
+        setCountdownTimer();
     }
 
     protected void moveToNextActivity(BaseActivity nextActivity) {
@@ -104,8 +144,51 @@ public abstract class BaseActivity extends AppCompatActivity {
         pushDataToNextActivity();
         //
 
-
         startActivity(intent);
+    }
+
+    protected void pushDifficultyData() {
+        intent.putExtra("GameDifficulty", difficulty);
+    }
+
+    protected void retrieveDifficultyData() {
+        difficulty = (Game)getIntent().getSerializableExtra("GameDifficulty");
+    }
+
+    protected void difficultySettings() {
+        if (difficulty != null) {
+            switch (difficulty) {
+                case EASY:
+                    totalTime = totalTime + (totalTime / 3);
+                    attemptLimit = attemptLimit + 3;
+                    break;
+                case MEDIUM:
+                    break;
+                case HARD:
+                    totalTime = totalTime - (totalTime / 3);
+                    attemptLimit = attemptLimit + 3;
+                    break;
+            }
+        }
+    }
+
+    protected void setCountdownTimer() {
+        timer = new CountDownTimer(totalTime, 1000) {
+            TextView timerTxt = (TextView)findViewById(getTimerText());
+            @Override
+            public void onTick(long time) {
+                if (timerTxt != null)
+                    timerTxt.setText("" + time / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                if (timerTxt != null)
+                    timerTxt.setText("0");
+                // Executes a method that compares user inputs with the expected inputs, giving points
+                // based on attempts and time left
+            }
+        }.start();
     }
 
     protected void elementFactory() {
@@ -137,6 +220,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         content.setOnDragListener(new EventListeners(this).LayoutDragListener);
     }
 
+    // Guarantees the distance of separation between elements/compounds
     protected int getPositionOffset(int width) {
         return width + el_margin;
     }
@@ -144,16 +228,33 @@ public abstract class BaseActivity extends AppCompatActivity {
     // Run this when you are ready to start a new activity... Finishing the former one.
     // REMEMBER TO KEEP SCORE AND TOTAL TIME
     protected void cleanseInputData() {
+        if (interactions.getElements().size() > 0) {
+            for (Element el : interactions.getElements()) {
+                content.removeView(el);
+            }
+        }
+
+        if (interactions.getCompounds().size() > 0) {
+            for (Compound co : interactions.getCompounds()) {
+                content.removeView(co);
+            }
+        }
+
+        // Even public accessors are mutable,
+        // Remember that this might not be very good practice at all.
+        // As this defeats the purpose of having accessors in the first place
+        // If possible, set the properties to be immutable (or final) and just create copies
         interactions.getElements().clear();
         interactions.getCompounds().clear();
         interactions.setIncr(0);
         elementId = 0;
+
         availableCompounds.clear();
         availableElements.clear();
     }
 
     // If the user chooses to reset their activity, reruns the process from scratch again.
-    protected void resetActivity() {
+    protected void resetActivityLayout() {
         cleanseInputData();
         onActivityStart();
     }
@@ -162,7 +263,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
-                .setMessage(getResources().getString(R.string.close_message))
+                .setMessage(resify.stringResify(R.string.close_message))
                 .setPositiveButton(resify.stringResify(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
