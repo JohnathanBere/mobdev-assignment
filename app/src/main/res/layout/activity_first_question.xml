@@ -10,23 +10,26 @@
 
     <TextView
         android:id="@+id/q1Txt"
-        android:layout_width="203dp"
-        android:layout_height="31dp"
-        android:layout_marginBottom="449dp"
+        android:layout_width="243dp"
+        android:layout_height="146dp"
+        android:layout_marginBottom="332dp"
         android:layout_marginEnd="32dp"
         android:layout_marginStart="16dp"
         android:text="TextView"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/q1Info"
+        app:layout_constraintBottom_toTopOf="@+id/infoBtnQ1"
         app:layout_constraintEnd_toStartOf="@+id/q1Timer"
+        app:layout_constraintHorizontal_bias="0.193"
         app:layout_constraintStart_toEndOf="@+id/q1Attempts" />
 
     <TextView
         android:id="@+id/q1Timer"
         android:layout_width="34dp"
         android:layout_height="30dp"
+        android:layout_marginBottom="449dp"
         android:text="10"
         android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/contBtnQ1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,42 +37,80 @@
         android:id="@+id/q1Attempts"
         android:layout_width="90dp"
         android:layout_height="23dp"
+        android:layout_marginBottom="456dp"
         android:text="Attempts:"
+        app:layout_constraintBottom_toTopOf="@+id/undoBtnQ1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/q1Reset"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="458dp"
-        android:text="Reset"
-        android:textSize="8sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/q1Attempts" />
+    <!--<Button-->
+        <!--android:id="@+id/q1Reset"-->
+        <!--android:layout_width="55dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginTop="458dp"-->
+        <!--android:text="Reset"-->
+        <!--android:textSize="8sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/q1Attempts" />-->
 
-    <Button
-        android:id="@+id/q1Info"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="109dp"
-        android:layout_marginStart="110dp"
-        android:text="Help"
-        android:textSize="8sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/q1btn"
-        app:layout_constraintStart_toEndOf="@+id/q1Reset" />
+    <!--<Button-->
+        <!--android:id="@+id/q1Info"-->
+        <!--android:layout_width="55dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginEnd="109dp"-->
+        <!--android:layout_marginStart="110dp"-->
+        <!--android:text="Help"-->
+        <!--android:textSize="8sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toStartOf="@+id/q1btn"-->
+        <!--app:layout_constraintStart_toEndOf="@+id/q1Reset" />-->
 
-    <Button
-        android:id="@+id/q1btn"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="449dp"
-        android:text="Submit"
-        android:textSize="8sp"
+    <!--<Button-->
+        <!--android:id="@+id/q1btn"-->
+        <!--android:layout_width="55dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginTop="449dp"-->
+        <!--android:text="Submit"-->
+        <!--android:textSize="8sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/q1Timer" />-->
+
+    <ImageButton
+        android:id="@+id/infoBtnQ1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="147dp"
+        android:layout_marginStart="147dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/infobtn"
+        android:cropToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/q1Timer" />
+        app:layout_constraintEnd_toStartOf="@+id/contBtnQ1"
+        app:layout_constraintStart_toEndOf="@+id/undoBtnQ1" />
+
+    <ImageButton
+        android:id="@+id/undoBtnQ1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/resetbtn"
+        android:cropToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/contBtnQ1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/continuebtn"
+        android:cropToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

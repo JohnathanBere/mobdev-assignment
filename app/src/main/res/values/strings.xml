@@ -17,4 +17,11 @@
     </string>
 
     <string name="requirements">Make</string>
+
+
+    <string name="draggingAction">Dragging %s</string>
+    <string name="draggingFailedAction">%1$s could not react with %2$s</string>
+    <string name="draggingSuccessAction">%s was successfully formed!</string>
+    <string name="shakeSeparateAction">Separated</string>
+    <string name="shakeResultAction">Retrieved</string>
 </resources>

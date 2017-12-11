@@ -35,6 +35,8 @@ public class EventListeners {
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     //Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
+                    String dragMsg = String.format(activity.res.getString(R.string.draggingAction), el.getName());
+                    activity.questionText.setText(dragMsg);
                     float new_x;
                     float new_y;
                     return true;
@@ -126,6 +128,7 @@ public class EventListeners {
 
     public ShakeEventListener.OnShakeListener OnShakeListener = new ShakeEventListener.OnShakeListener() {
         ArrayList<Compound> splitCompounds = new ArrayList<>();
+        String separateMsg = "Retrieved ";
         /**
          * This handles the deletion of compounds from the interactions class for an activity.
          */
@@ -145,10 +148,13 @@ public class EventListeners {
                     activity.pop.start();
                     activity.vibr.vibrate(500);
                 }
+                compoundStringProcessor();
+                activity.questionText.setText(separateMsg);
                 deletePrimedCompounds();
             }
             // the collection should be empty after a shake has occurred.
             splitCompounds.clear();
+            separateMsg = "Retrieved ";
             // Todo evaluate if elements/compounds meet the expected condition.
         }
 
@@ -157,7 +163,7 @@ public class EventListeners {
             for (Compound co : compounds) {
                 co.triggerCompoundSplit();
                 if (co.hasCompoundSplit()) {
-                    elementsInCompound(co.getElements(), co.getX(), co.getY());
+                    elementsInCompound(co, co.getElements(), co.getX(), co.getY());
                     activity.content.removeView(co);
                     activity.pop.start();
                     activity.vibr.vibrate(500);
@@ -166,12 +172,52 @@ public class EventListeners {
             }
         }
 
+        void compoundStringProcessor() {
+            ArrayList<Compound> compounds = splitCompounds;
+
+            for (Compound co: compounds) {
+                int currentIndex = compounds.indexOf(co);
+                elementStringProcessor(co, co.getElements());
+                if (currentIndex < compounds.size()) {
+                    if (currentIndex == compounds.size() - 2) {
+                        separateMsg = separateMsg + " &";
+                    }
+
+                    else if (currentIndex < compounds.size() - 1) {
+                        separateMsg = separateMsg + ", ";
+                    }
+                }
+            }
+        }
+
+        void elementStringProcessor(Compound compound, ArrayList<Element> elements) {
+            for (Element el : elements) {
+                int currentIndex = elements.indexOf(el);
+
+                if (currentIndex < elements.size()) {
+                    if (currentIndex == elements.size() - 2) {
+                        separateMsg = separateMsg + " " + el.getName() + " &";
+                    }
+
+                    else if (currentIndex < elements.size() - 1) {
+                        separateMsg = separateMsg + " " + el.getName() + ", ";
+                    }
+
+                    else {
+                        separateMsg = separateMsg + " " + el.getName();
+                    }
+                }
+            }
+            separateMsg = separateMsg + " from " + compound.getName();
+        }
+
         // Reintroduces constituent elements of a compound to the view.
-        void elementsInCompound(ArrayList<Element> elements, float x, float y) {
+        void elementsInCompound(Compound compound, ArrayList<Element> elements, float x, float y) {
             int margin = activity.res.getInteger(R.integer.el_dim);
 
             for (Element el : elements) {
-                Element element = new Element(activity, el.getName(), el.getFormula(), x, y, activity.elementId++, el.getShapeColor(), el.getGroup());
+                // Creating new elementIds for formally existing elements proved to be far too unpredictable
+                Element element = new Element(activity, el.getName(), el.getFormula(), x, y, el.getElementId(), el.getShapeColor(), el.getGroup());
                 int currentIndex = elements.indexOf(el);
 
                 if (currentIndex > 0) {

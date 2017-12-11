@@ -57,6 +57,7 @@ public class ViewInteractions {
                 (el.getRect().intersect(element.getRect()))
             )
             {
+                // Trigger sound and vibrations to indicate that the element drop point was indeed valid
                 activity.pop.start();
                 activity.vibr.vibrate(500);
                 this.reactElements(el, element);
@@ -94,6 +95,8 @@ public class ViewInteractions {
                 activity.numberOfAttempts++;
                 String attemptsMessage = String.format(activity.res.getString(R.string.attempts), activity.numberOfAttempts);
                 activity.attemptsText.setText(attemptsMessage);
+                String failMsg = String.format(activity.res.getString(R.string.draggingFailedAction), el.getName(), element.getName());
+                activity.questionText.setText(failMsg);
 
                 if (activity.numberOfAttempts >= activity.attemptLimit) {
                     Toast.makeText(activity, "You have tried too many times, just give up", Toast.LENGTH_SHORT).show();
@@ -110,10 +113,7 @@ public class ViewInteractions {
                     }
                 }
 
-                Toast.makeText(activity, String.format("The buzzer is %dms long", activity.buzzer.getDuration()), Toast.LENGTH_SHORT).show();
-                //Toast.makeText(activity, el.getName() + " & " + element.getName() + " cannot react!", Toast.LENGTH_SHORT).show();
-                // if (activity.buzzer.isPlaying())
-                    // activity.buzzer.stop();
+
                 break;
             }
         }
@@ -179,6 +179,9 @@ public class ViewInteractions {
         // Remove the reacted elements from the view
         activity.content.removeView(firstElement);
         activity.content.removeView(secondElement);
+
+        String successMsg = String.format(activity.res.getString(R.string.draggingSuccessAction), compound.getName());
+        activity.questionText.setText(successMsg);
     }
 
     /**

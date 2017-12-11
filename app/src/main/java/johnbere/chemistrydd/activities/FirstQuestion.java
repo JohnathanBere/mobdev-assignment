@@ -4,8 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import johnbere.chemistrydd.R;
@@ -15,14 +14,9 @@ import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.helpers.ElementGroup;
 
 public class FirstQuestion extends BaseActivity {
-    Button nextBtn, resetBtn;
-    View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View view) {
-            resetActivityLayout();
-            return false;
-        }
-    };
+    // Button nextBtn, resetBtn;
+    ImageButton contBtn, undoBtn, infoBtn;
+    boolean isPaused;
     protected void pushDataToNextActivity() {
         // int val = 123
         // intent.putExtra("numbah", val)
@@ -39,17 +33,57 @@ public class FirstQuestion extends BaseActivity {
 
     @Override
     protected void viewActivityBindings() {
-        nextBtn = findViewById(R.id.q1btn);
-        resetBtn = findViewById(R.id.q1Reset);
+        contBtn = findViewById(R.id.contBtnQ1);
+        undoBtn = findViewById(R.id.undoBtnQ1);
+        infoBtn = findViewById(R.id.infoBtnQ1);
 
-        nextBtn.setOnClickListener(new View.OnClickListener() {
+        contBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 moveToNextActivity(getNextActivity());
                 finish();
             }
         });
-        resetBtn.setOnLongClickListener(longClickListener);
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                questionText.setText(requirements);
+            }
+        });
+        infoBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                moveToNextActivity(new GuideLines());
+                return false;
+            }
+        });
+        undoBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                resetActivityLayout();
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // If we are navigating away to the guidelines page, pause the timer
+        timer.cancel();
+        isPaused = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Resume the timer when we return to the question
+        if (isPaused) {
+            setCountdownTimer();
+            isPaused = false;
+        }
     }
 
     @Override
@@ -66,27 +100,8 @@ public class FirstQuestion extends BaseActivity {
         requiredCompounds.add(new Compound(context, "Lithium Bromide", "LiB", 0, 0, 12, 0, null));
         requirements = res.getString(R.string.requirements);
 
-        // Todo store this in a method. Proceed to do the same with the 
-        // This loop processes the list of requests that the game will ask of the user.
-        for (Compound co : requiredCompounds) {
-            int index = requiredCompounds.indexOf(co);
-            if (index < requiredCompounds.size()) {
-                // If the index is at the second to last item.
-                if (index == requiredCompounds.size() - 2) {
-                    requirements = requirements + " " + co.getName() + " &";
-                }
-
-                // Otherwise should be a separation leading up to the last item
-                else if (index < requiredCompounds.size() - 1) {
-                    requirements = requirements + " " + co.getName() + ", ";
-                }
-
-                // Other wise we can assume we're at the last item
-                else {
-                    requirements = requirements + " " + co.getName();
-                }
-            }
-        }
+        // Process the requested substances
+        textMessageProcessor();
 
         questionText.setText(requirements);
         questionText.bringToFront();

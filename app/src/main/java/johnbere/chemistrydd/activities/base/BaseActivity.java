@@ -47,6 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Resources res;
     public CountDownTimer timer;
     long totalTime = 11000;
+    long timeRemaining = 0;
     public int
             elementId = 0,
             list_start_x,
@@ -167,6 +168,52 @@ public abstract class BaseActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void textMessageProcessor() {
+        // Todo store this in a method. Proceed to do the same with the elements
+        // This loop processes the list of requests that the game will ask of the user.
+        for (Compound co : requiredCompounds) {
+            int index = requiredCompounds.indexOf(co);
+            if (index < requiredCompounds.size()) {
+                // If the index is at the second to last item.
+                if (index == requiredCompounds.size() - 2) {
+                    requirements = requirements + " " + co.getName() + " &";
+                }
+
+                // Otherwise should be a separation leading up to the last item
+                else if (index < requiredCompounds.size() - 1) {
+                    requirements = requirements + " " + co.getName() + ", ";
+                }
+
+                // Other wise we can assume we're at the last item
+                else {
+                    requirements = requirements + " " + co.getName();
+                    if (requiredElements.size() > 0) {
+                        requirements = requirements + " & ";
+                    }
+                }
+            }
+        }
+        for (Element el : requiredElements) {
+            int index = requiredElements.indexOf(el);
+            if (index < requiredElements.size()) {
+                // If the index is at the second to last item.
+                if (index == requiredElements.size() - 2) {
+                    requirements = requirements + " " + el.getName() + " &";
+                }
+
+                // Otherwise should be a separation leading up to the last item
+                else if (index < requiredElements.size() - 1) {
+                    requirements = requirements + " " + el.getName() + ", ";
+                }
+
+                // Other wise we can assume we're at the last item
+                else {
+                    requirements = requirements + " " + el.getName();
+                }
+            }
+        }
+    }
+
     protected void pushDifficultyData() {
         intent.putExtra("GameDifficulty", difficulty);
     }
@@ -193,6 +240,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void setCountdownTimer() {
+        // Replace the total time with the remaining time if its quantity is greater
+        // than 0
+        totalTime = timeRemaining > 0 ? timeRemaining : totalTime;
         timer = new CountDownTimer(totalTime, 1000) {
             TextView timerTxt = (TextView)findViewById(getTimerText());
             @Override
@@ -200,6 +250,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 if (timerTxt != null) {
                     timerTxt.setText(String.format(res.getString(R.string.time_remaining), time / 1000));
                 }
+                // Gets the time remaining.
+                timeRemaining = time;
             }
 
             @Override
