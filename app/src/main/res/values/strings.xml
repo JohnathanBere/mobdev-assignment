@@ -5,4 +5,16 @@
     <string name="no">No</string>
 
     <string name="close_message">Are you sure you want to close? All progress will be lost.</string>
+
+    <string name="attempts">Attempts: %1$d</string>
+    <string name="time_remaining">%1$d</string>
+    
+    <string name="guidelines">
+        The aim of this game is to form compounds or elements in the shortest amount of time with the least amount of mistakes. \n \n
+        - Drag an element on top of another element to form a compound. \n \n
+        - To turn a compound back into its reactants, double tap on it, and shake the phone. This may be irreversible in some instances&#8230;
+        However you may reset to restore your elements and compounds to their original positions.
+    </string>
+
+    <string name="requirements">Make</string>
 </resources>

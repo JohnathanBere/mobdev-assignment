@@ -3,9 +3,11 @@ package johnbere.chemistrydd.helpers;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import johnbere.chemistrydd.activities.FirstQuestion;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
@@ -58,6 +60,13 @@ public class ViewInteractions {
                 activity.pop.start();
                 activity.vibr.vibrate(500);
                 this.reactElements(el, element);
+
+                // Now updates the previous coordinates to a valid position
+                el.setPrevX(el.getX());
+                el.setPrevY(el.getY());
+
+                // check if the reaction created one of the desired elements
+                // Todo evaluate if elements/compounds meet the expected condition.
                 break;
             }
             // If the statement similiar to the previous checks except the element and intersectioned element
@@ -73,7 +82,38 @@ public class ViewInteractions {
             {
                 activity.buzzer.start();
                 activity.vibr.vibrate(3000);
+
+                // Resets the element position to its last dragged position
+                el.setX(el.getPrevX());
+                el.setY(el.getPrevY());
+                el.setSquareX((int)el.getPrevX());
+                el.setSquareY((int)el.getPrevY());
+                el.reCalculateCoord();
+
+                // Todo Remember to update the counter of the activity attempts
+                activity.numberOfAttempts++;
+                String attemptsMessage = String.format(activity.res.getString(R.string.attempts), activity.numberOfAttempts);
+                activity.attemptsText.setText(attemptsMessage);
+
+                if (activity.numberOfAttempts >= activity.attemptLimit) {
+                    Toast.makeText(activity, "You have tried too many times, just give up", Toast.LENGTH_SHORT).show();
+
+                    /**
+                     * Todo
+                     *  Try to come up with a results panel for that question that
+                     *  reveals the desired outcome if the user got stuff wrong
+                     *  or just being correct, refrain from directly going to the next activity without feedback
+                     */
+                    if (activity.getNextActivity() != null) {
+                        activity.moveToNextActivity(activity.getNextActivity());
+                        activity.finish();
+                    }
+                }
+
+                Toast.makeText(activity, String.format("The buzzer is %dms long", activity.buzzer.getDuration()), Toast.LENGTH_SHORT).show();
                 //Toast.makeText(activity, el.getName() + " & " + element.getName() + " cannot react!", Toast.LENGTH_SHORT).show();
+                // if (activity.buzzer.isPlaying())
+                    // activity.buzzer.stop();
                 break;
             }
         }

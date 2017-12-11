@@ -30,7 +30,7 @@ public class EventListeners {
             Element el = (Element)event.getLocalState();
 
             // Ensures that the shadow is not dragged away from view.
-            int dropMargin = activity.resify.intResify(R.integer.el_dim);
+            int dropMargin = activity.res.getInteger(R.integer.el_dim);
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
@@ -65,7 +65,7 @@ public class EventListeners {
 
                     // Double the margin if the dragged view is a compound
                     if (event.getLocalState() instanceof Compound)
-                        dropMargin = activity.resify.intResify(R.integer.co_dim);
+                        dropMargin = activity.res.getInteger(R.integer.co_dim);
 
                     // Ensures that the dragged element shadow is not taken off-screen, losing its ability
                     // to become visible again.
@@ -149,6 +149,7 @@ public class EventListeners {
             }
             // the collection should be empty after a shake has occurred.
             splitCompounds.clear();
+            // Todo evaluate if elements/compounds meet the expected condition.
         }
 
         // Compounds primed for a split will be added to the split collection for deletion
@@ -167,7 +168,7 @@ public class EventListeners {
 
         // Reintroduces constituent elements of a compound to the view.
         void elementsInCompound(ArrayList<Element> elements, float x, float y) {
-            int margin = activity.resify.intResify(R.integer.el_dim);
+            int margin = activity.res.getInteger(R.integer.el_dim);
 
             for (Element el : elements) {
                 Element element = new Element(activity, el.getName(), el.getFormula(), x, y, activity.elementId++, el.getShapeColor(), el.getGroup());

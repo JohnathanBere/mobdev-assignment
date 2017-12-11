@@ -19,6 +19,9 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
+    protected void setRequirements() {}
+
+    @Override
     protected void pushDataToNextActivity() {
         pushDifficultyData();
     }
@@ -57,12 +60,22 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
-    protected int getAttemptLimitText() {
-        return 0;
+    protected int getNumberOfAttempts() {
+        return R.id.q2Attempts;
     }
 
     @Override
     protected int getScoreText() {
         return 0;
+    }
+
+    @Override
+    protected int getQuestionText() {
+        return 0;
+    }
+
+    @Override
+    public BaseActivity getNextActivity() {
+        return null;
     }
 }

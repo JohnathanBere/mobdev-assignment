@@ -9,7 +9,7 @@ import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.R;
 
 public class MainActivity extends BaseActivity {
-    Button startBtn;
+    Button startBtn, guideBtn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,14 +18,27 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void viewActivityBindings() {
         startBtn = findViewById(R.id.startBtn);
+        guideBtn = findViewById(R.id.guide);
 
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToNextActivity(new Difficulty());
+                moveToNextActivity(getNextActivity());
                 finish();
             }
         });
+
+        guideBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                moveToNextActivity(new GuideLines());
+            }
+        });
+    }
+
+    @Override
+    public BaseActivity getNextActivity() {
+        return new Difficulty();
     }
 
     @Override
@@ -58,7 +71,7 @@ public class MainActivity extends BaseActivity {
     protected void getDataFromPreviousActivity() {}
 
     @Override
-    protected int getAttemptLimitText() {
+    protected int getNumberOfAttempts() {
         return 0;
     }
 
@@ -66,4 +79,12 @@ public class MainActivity extends BaseActivity {
     protected int getScoreText() {
         return 0;
     }
+
+    @Override
+    protected int getQuestionText() {
+        return 0;
+    }
+
+    @Override
+    protected void setRequirements() {}
 }

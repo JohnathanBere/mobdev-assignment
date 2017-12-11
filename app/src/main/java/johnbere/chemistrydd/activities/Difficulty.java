@@ -24,7 +24,7 @@ public class Difficulty extends BaseActivity {
             else if (view.getId() == R.id.hardBtn) {
                 difficulty = Game.HARD;
             }
-            moveToNextActivity(new FirstQuestion());
+            moveToNextActivity(getNextActivity());
             finish();
         }
     };
@@ -70,18 +70,33 @@ public class Difficulty extends BaseActivity {
     }
 
     @Override
+    public BaseActivity getNextActivity() {
+        return new FirstQuestion();
+    }
+
+    @Override
     protected void addElementsToLists() {}
 
     @Override
     protected void getDataFromPreviousActivity() {}
 
     @Override
-    protected int getAttemptLimitText() {
+    protected int getNumberOfAttempts() {
         return 0;
     }
 
     @Override
     protected int getScoreText() {
         return 0;
+    }
+
+    @Override
+    protected int getQuestionText() {
+        return 0;
+    }
+
+    @Override
+    protected void setRequirements() {
+
     }
 }

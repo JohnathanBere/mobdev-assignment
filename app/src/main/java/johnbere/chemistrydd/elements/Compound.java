@@ -30,27 +30,30 @@ public class Compound extends Element {
         String form = "";
         String compoundName = "";
 
-        // Sort constituent elements by element group
-        Collections.sort(elements, new Comparator<Element>() {
-            @Override
-            public int compare(Element element1, Element element2) {
-                return element1.getGroup().compareTo(element2.getGroup());
-            }
-        });
+        // Do a check to see if there are any elements...
+        if (this.elements != null) {
+            // Sort constituent elements by element group
+            Collections.sort(elements, new Comparator<Element>() {
+                @Override
+                public int compare(Element element1, Element element2) {
+                    return element1.getGroup().compareTo(element2.getGroup());
+                }
+            });
 
-        for (Element el : elements) {
-            form = form + el.getFormula();
-            if (el.getGroup() == ElementGroup.ALKALIMETALS)
-                compoundName = compoundName + el.getName() + " ";
-            // Halogens will be suffixed with 'ide'
-            if (el.getGroup() == ElementGroup.HALOGENS) {
-                StringBuilder halogenName = new StringBuilder(el.getName());
-                halogenName.setCharAt(halogenName.length() - 2, 'd');
-                compoundName = compoundName + halogenName;
+            for (Element el : elements) {
+                form = form + el.getFormula();
+                if (el.getGroup() == ElementGroup.ALKALIMETALS)
+                    compoundName = compoundName + el.getName() + " ";
+                // Halogens will be suffixed with 'ide'
+                if (el.getGroup() == ElementGroup.HALOGENS) {
+                    StringBuilder halogenName = new StringBuilder(el.getName());
+                    halogenName.setCharAt(halogenName.length() - 2, 'd');
+                    compoundName = compoundName + halogenName;
+                }
             }
         }
 
-        this.name = compoundName;
+        this.name = !compoundName.equals("") ? compoundName : this.name;
         this.formula = form;
         this.redraw();
     }
