@@ -12,6 +12,7 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
@@ -33,6 +36,7 @@ import johnbere.chemistrydd.views.Results;
 
 // use a difficulty setting (Before the first question) that determines the time taken and attempts made
 // determining the scores a user gets
+// Todo 12/12 Finally add a scores page that gives a grade based on points and difficulty.
 public abstract class BaseActivity extends AppCompatActivity {
     public SensorManager sensorManager;
     public ShakeEventListener sensorListener;
@@ -368,7 +372,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         onActivityStart();
     }
 
+    // Todo 12/12 resume work for proper processing of the required elements
     public void getResults() {
+        Set<Element> dedupedElements;
+        Set<Compound> dedupedCompounds;
+
+
         // Proceed to disable all the touch listeners, to prevent further touches.
         for (Element el : interactions.getElements()) {
             el.setOnTouchListener(null);
@@ -378,43 +387,82 @@ public abstract class BaseActivity extends AppCompatActivity {
             co.setOnTouchListener(null);
         }
 
+        sensorManager.unregisterListener(sensorListener);
+
         // Algorithms to evaluate what the user got correct
         for (Element el : requiredElements) {
             if (interactions.getElements().size() > 0) {
                 for (Element e : interactions.getElements()) {
                     if (e.getName().equals(el.getName())) {
-                        elementsMatched.add(el);
+//                        if (e.getElementId() != el.getElementId()) {
+                            elementsMatched.add(e);
+//                        }
                     }
                 }
+                // This cleanses any duplicates
+                dedupedElements = new HashSet<>(elementsMatched);
+                elementsMatched = new ArrayList<>(dedupedElements);
             }
         }
 
+        for (Element el : elementsMatched) {
+            Log.d("JB", "Successfully added " + el.getName() + " with an id of " + el.getElementId());
+        }
+
+        // Todo 12/12 make sure points are added for every matched substance.
         for (Compound co : requiredCompounds) {
-            for (Compound c : interactions.getCompounds()) {
-                if (c.getName().equals(co.getName())) {
-                    compoundsMatched.add(co);
+            if (interactions.getCompounds().size() > 0) {
+                for (Compound c : interactions.getCompounds()) {
+                    if (c.getName().equals(co.getName())) {
+                        // Prevent potential duplicates
+//                        if (c.getElementId() != co.getElementId()) {
+                            compoundsMatched.add(c);
+//                        }
+                    }
                 }
+                // This cleanses any duplicates
+                dedupedCompounds = new HashSet<>(compoundsMatched);
+                compoundsMatched = new ArrayList<>(dedupedCompounds);
             }
         }
+
+        Log.d("JB", "Elements matched " + elementsMatched.size());
+        Log.d("JB", "Elements in inventory " + interactions.getElements().size());
+        Log.d("JB", "Elements required " + requiredElements.size());
 
         if (compoundsMatched.size() == requiredCompounds.size() && elementsMatched.size() == requiredElements.size()) {
             allInputsCorrect = true;
-        } else if (compoundsMatched.size() < requiredCompounds.size()) {
-            for (Compound co : requiredCompounds) {
-                String str = "";
-                for (Element el : co.getElements()) {
-                    int index = co.getElements().indexOf(el);
+        }
 
-                    if (index < co.getElements().size()) {
-                        if (index < co.getElements().size() - 1) {
-                            str = str + el.getName() + " + ";
-                        } else {
-                            str = str + el.getName() + " -> " + co.getName();
+        if (compoundsMatched.size() < requiredCompounds.size()) {
+            for (Compound co : requiredCompounds) {
+                if (interactions.getCompounds().size() > 0) {
+                    for (Compound c : interactions.getCompounds()) {
+                        if (!(c.getName().equals(co.getName()))) {
+                            compoundFormulaProcessor(co);
                         }
                     }
+                } else {
+                    compoundFormulaProcessor(co);
                 }
-                messageList.add(str);
             }
+        }
+
+        if (elementsMatched.size() < requiredElements.size()) {
+//            for (Element el : requiredElements) {
+//                if (interactions.getElements().size() > 0) {
+//                    for (Element e : interactions.getElements()) {
+//                        if (!(e.getName().equals(el.getName()))) {
+//                            // Log.d("JB",  "Missing " + el.getName());
+//                            elementFormulaProcessor(el);
+//                        }
+//                    }
+//                } else {
+//                    //Log.d("JB",  "Missing " + el.getName());
+//                    elementFormulaProcessor(el);
+//                }
+//            }
+
         }
 
         String titleText = allInputsCorrect ? "Perfect!" : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect";
@@ -443,6 +491,28 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Stop the timer
         timer.cancel();
+    }
+
+    protected void compoundFormulaProcessor(Compound co) {
+        String str = "";
+        for (Element el : co.getElements()) {
+            int index = co.getElements().indexOf(el);
+
+            if (index < co.getElements().size()) {
+                if (index < co.getElements().size() - 1) {
+                    str = str + el.getName() + " + ";
+                } else {
+                    str = str + el.getName() + " -> " + co.getName();
+                }
+            }
+        }
+        messageList.add(str);
+    }
+
+    protected void elementFormulaProcessor(Element el) {
+        String str = "Missing ";
+        str = str + el.getName();
+        messageList.add(str);
     }
 
     // Asks if the user is sure about wanting to close the app

@@ -6,29 +6,48 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
+import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.helpers.ElementGroup;
 
 public class SecondQuestion extends BaseActivity {
     @Override
     protected void addElementsToLists() {
-        availableElements.add(new Element(context, "Potassium", "K",list_start_x, list_start_y, elementId++, Color.LTGRAY, ElementGroup.ALKALIMETALS));
-        availableElements.add(new Element(context, "Iodine", "I",list_start_x + getPositionOffset(el_width), list_start_y, elementId++, Color.BLUE, ElementGroup.HALOGENS));
-        availableElements.add(new Element(context, "Astatine", "At",list_start_x + (getPositionOffset(el_width)) * 2, list_start_y, elementId++, Color.BLACK, ElementGroup.HALOGENS));
-        availableElements.add(new Element(context, "Rubidium", "Rb",list_start_x + (getPositionOffset(el_width))* 3, list_start_y, elementId++, Color.LTGRAY, ElementGroup.ALKALIMETALS));
+        ArrayList<Element> h2O = new ArrayList<>();
+        h2O.add(new Element(context, "Hydrogen", "H", 0, 0, 20, Color.DKGRAY, ElementGroup.HYDROGEN));
+        h2O.add(new Element(context, "Hydrogen", "H", 0, 0, 21, Color.DKGRAY, ElementGroup.HYDROGEN));
+        h2O.add(new Element(context, "Oxygen", "O", 0, 0, 22, Color.RED, ElementGroup.CHALCOGENS));
+
+        ArrayList<Element> liCl = new ArrayList<>();
+        liCl.add(new Element(context, "Lithium", "Li", 0, 0, 23, Color.LTGRAY, ElementGroup.ALKALIMETALS));
+        liCl.add(new Element(context, "Chlorine", "Cl", 0, 0, 24, Color.BLUE, ElementGroup.HALOGENS));
+
+
+        availableCompounds.add(new Compound(context, "Water", "H2O", list_start_x, list_start_y, elementId++, Color.GREEN, h2O));
+        availableCompounds.add(new Compound(context, "Lithium Chloride", "LiCl", list_start_x + getPositionOffset(co_width), list_start_y, elementId++, Color.GREEN, liCl));
     }
 
+    // Todo 12/12 Be rigorous regarding substance requirements.
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void setRequirements() {
+        requiredElements.add(new Element(context, "Hydrogen", "H", 0, 0, 34, 0, ElementGroup.HYDROGEN));
+        requiredElements.add(new Element(context, "Hydrogen", "H", 0, 0, 35, 0, ElementGroup.HYDROGEN));
+        requiredElements.add(new Element(context, "Oxygen", "O", 0, 0, 36, 0, ElementGroup.CHALCOGENS));
+        requiredElements.add(new Element(context, "Lithium", "Li", 0, 0, 37, 0, ElementGroup.ALKALIMETALS));
+        requiredElements.add(new Element(context, "Chlorine", "Cl", 0, 0, 38, 0, ElementGroup.HALOGENS));
 
-        startCountdownTimer();
+        requirements = res.getString(R.string.requirements);
+
+        // Process the requested substances
+        textMessageProcessor();
+
+        questionText.setText(requirements);
+        questionText.bringToFront();
     }
-
-    @Override
-    protected void setRequirements() {}
 
     @Override
     protected void pushDataToNextActivity() {
@@ -142,5 +161,10 @@ public class SecondQuestion extends BaseActivity {
     @Override
     public BaseActivity getNextActivity() {
         return new FinalScreen();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 }

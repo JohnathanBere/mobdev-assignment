@@ -35,14 +35,12 @@ public class FirstQuestion extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         onNavigateReturn();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         onNavigateAway();
     }
 
@@ -63,7 +61,6 @@ public class FirstQuestion extends BaseActivity {
         infoBtn.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                // onNavigateAway();
                 moveToNextActivity(new GuideLines());
                 return true;
             }

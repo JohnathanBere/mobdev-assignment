@@ -5,13 +5,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
-import johnbere.chemistrydd.activities.base.BaseActivity;
 
 // This will be the results panel that will feed the user back their scores for that question.
 // Depending if they got all of the questions, or some of the questions right.
@@ -37,20 +34,21 @@ public class Results extends View {
         panel = new Rect();
         panel.left = 80;
         panel.right = 950;
-        panel.top = 500;
+        panel.top = 80;
 
         if (isCompletelyCorrect) {
-            panel.bottom = 800;
+            panel.top = 500;
+            panel.bottom = panel.top + 300;
         }
         else {
-            panel.bottom = 1400;
+            panel.bottom = panel.top;
         }
 
         paneHeading = new Rect();
-        paneHeading.left = 80;
-        paneHeading.right = 950;
-        paneHeading.top = 500;
-        paneHeading.bottom = 625;
+        paneHeading.left = panel.left;
+        paneHeading.right = panel.right;
+        paneHeading.top = panel.top;
+        paneHeading.bottom = paneHeading.top + 125;
 
         paneColor = new Paint();
         panelColor = new Paint();
@@ -88,12 +86,14 @@ public class Results extends View {
             for (int i = 0; i < this.solutionText.size(); i++) {
                 canvas.drawText(this.solutionText.get(i), (float)(panel.left + 15), (float)(paneHeading.top + 200 + (200 * i)), solutionTextColor);
                 if (i == this.solutionText.size() - 1) {
-                    canvas.drawText("...Touch this panel to move on", (float)(panel.left + 15), (float)(paneHeading.top + 200 + (200 * (i + 1))), solutionTextColor);
+                    canvas.drawText("...Touch to continue", (float)(panel.left + 15), (float)(paneHeading.top + 200 + (200 * (i + 1))), solutionTextColor);
                 }
             }
+            panel.bottom = panel.top + (this.solutionText.size() * 400);
+            this.invalidate();
         }
         if (this.solutionText.size() == 0) {
-            canvas.drawText("...Touch this panel to move on", (float)(panel.left + 15), (float)(paneHeading.top + 200), solutionTextColor);
+            canvas.drawText("...Touch to continue", (float)(panel.left + 15), (float)(paneHeading.top + 200), solutionTextColor);
         }
     }
 }
