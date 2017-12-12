@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -71,10 +72,9 @@ public abstract class BaseActivity extends AppCompatActivity {
             el_margin,
             el_width,
             co_width,
-            totalScore = 0,
-            multiplier = 1,
             numberOfAttempts = 0,
             attemptLimit = 5;
+    public float multiplier = 1, totalScore = 0;
 
     // Abstract methods that will be overridden by the sub-classes
     // Ensuring consistency with the helper classes the require activities of type
@@ -175,6 +175,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Reacts accordingly to player actions such as attempts or time management
         setAttemptsText();
+
+        if (scoreText != null) {
+            String scoreStr = String.format(res.getString(R.string.totalScore), totalScore);
+            scoreText.setText("Score: " + totalScore);
+        }
     }
 
     protected void setAttemptsText() {
@@ -245,10 +250,12 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void pushDifficultyData() {
         intent.putExtra("GameDifficulty", difficulty);
+        intent.putExtra("TotalScore", totalScore);
     }
 
     protected void retrieveDifficultyData() {
         difficulty = (Game)getIntent().getSerializableExtra("GameDifficulty");
+        totalScore = getIntent().getExtras() != null ? getIntent().getExtras().getFloat("TotalScore") : 0;
     }
 
     protected void difficultySettings() {
@@ -377,7 +384,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         Set<Element> dedupedElements;
         Set<Compound> dedupedCompounds;
 
-
         // Proceed to disable all the touch listeners, to prevent further touches.
         for (Element el : interactions.getElements()) {
             el.setOnTouchListener(null);
@@ -394,9 +400,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (interactions.getElements().size() > 0) {
                 for (Element e : interactions.getElements()) {
                     if (e.getName().equals(el.getName())) {
-//                        if (e.getElementId() != el.getElementId()) {
-                            elementsMatched.add(e);
-//                        }
+                        elementsMatched.add(el);
                     }
                 }
                 // This cleanses any duplicates
@@ -405,19 +409,12 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-        for (Element el : elementsMatched) {
-            Log.d("JB", "Successfully added " + el.getName() + " with an id of " + el.getElementId());
-        }
-
         // Todo 12/12 make sure points are added for every matched substance.
         for (Compound co : requiredCompounds) {
             if (interactions.getCompounds().size() > 0) {
                 for (Compound c : interactions.getCompounds()) {
                     if (c.getName().equals(co.getName())) {
-                        // Prevent potential duplicates
-//                        if (c.getElementId() != co.getElementId()) {
-                            compoundsMatched.add(c);
-//                        }
+                        compoundsMatched.add(co);
                     }
                 }
                 // This cleanses any duplicates
@@ -426,46 +423,44 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-        Log.d("JB", "Elements matched " + elementsMatched.size());
-        Log.d("JB", "Elements in inventory " + interactions.getElements().size());
-        Log.d("JB", "Elements required " + requiredElements.size());
-
         if (compoundsMatched.size() == requiredCompounds.size() && elementsMatched.size() == requiredElements.size()) {
             allInputsCorrect = true;
         }
 
-        if (compoundsMatched.size() < requiredCompounds.size()) {
+        // These two algorithms will add points if the required element or compound is in any of the pots that the
+        // user  made
+        // They will also highlight any missing compounds or elements
+//        if (compoundsMatched.size() < requiredCompounds.size()) {
             for (Compound co : requiredCompounds) {
-                if (interactions.getCompounds().size() > 0) {
-                    for (Compound c : interactions.getCompounds()) {
-                        if (!(c.getName().equals(co.getName()))) {
-                            compoundFormulaProcessor(co);
-                        }
+                if (compoundsMatched.size() > 0) {
+                    if (!compoundsMatched.contains(co)) {
+                        compoundFormulaProcessor(co);
+                    } else if (compoundsMatched.contains(co)){
+                        totalScore = totalScore + multiplier;
                     }
                 } else {
                     compoundFormulaProcessor(co);
                 }
             }
-        }
+//        }
 
-        if (elementsMatched.size() < requiredElements.size()) {
-//            for (Element el : requiredElements) {
-//                if (interactions.getElements().size() > 0) {
-//                    for (Element e : interactions.getElements()) {
-//                        if (!(e.getName().equals(el.getName()))) {
-//                            // Log.d("JB",  "Missing " + el.getName());
-//                            elementFormulaProcessor(el);
-//                        }
-//                    }
-//                } else {
-//                    //Log.d("JB",  "Missing " + el.getName());
-//                    elementFormulaProcessor(el);
-//                }
-//            }
+//        if (elementsMatched.size() < requiredElements.size()) {
+            for (Element el : requiredElements) {
+                if (elementsMatched.size() > 0) {
+                    if (!elementsMatched.contains(el)) {
+                        elementFormulaProcessor(el);
+                    } else if (elementsMatched.contains(el)) {
+                        // add a point
+                        totalScore = totalScore + multiplier;
+                    }
+                } else {
+                   elementFormulaProcessor(el);
+                }
+            }
+//        }
 
-        }
-
-        String titleText = allInputsCorrect ? "Perfect!" : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect";
+        // Add the score to the title text, better UX and it's just easier...
+        String titleText = allInputsCorrect ? "Perfect! Score: " + totalScore : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect, Score: " + totalScore;
 
         results = new Results(context, titleText, messageList, allInputsCorrect);
         results.setOnTouchListener(new View.OnTouchListener() {

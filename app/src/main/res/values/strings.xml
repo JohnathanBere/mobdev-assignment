@@ -24,4 +24,6 @@
     <string name="draggingSuccessAction">%s was successfully formed!</string>
     <string name="shakeSeparateAction">Separated</string>
     <string name="shakeResultAction">Retrieved</string>
+
+    <string name="totalScore">Score: %f</string>
 </resources>

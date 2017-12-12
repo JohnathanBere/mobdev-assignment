@@ -161,7 +161,7 @@ public class FirstQuestion extends BaseActivity {
 
     @Override
     protected int getScoreText() {
-        return 0;
+        return R.id.q1Score;
     }
 
     @Override
