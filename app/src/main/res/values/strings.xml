@@ -8,7 +8,7 @@
 
     <string name="attempts">Attempts: %1$d</string>
     <string name="time_remaining">%1$d</string>
-    
+
     <string name="guidelines">
         The aim of this game is to form compounds or elements in the shortest amount of time with the least amount of mistakes. \n \n
         - Drag an element on top of another element to form a compound. \n \n

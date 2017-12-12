@@ -12,10 +12,15 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
@@ -24,6 +29,7 @@ import johnbere.chemistrydd.helpers.EventListeners;
 import johnbere.chemistrydd.helpers.Game;
 import johnbere.chemistrydd.helpers.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
+import johnbere.chemistrydd.views.Results;
 
 // use a difficulty setting (Before the first question) that determines the time taken and attempts made
 // determining the scores a user gets
@@ -39,6 +45,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     public ArrayList<Compound> availableCompounds = new ArrayList<>();
     public ArrayList<Element> requiredElements = new ArrayList<>();
     public ArrayList<Compound> requiredCompounds = new ArrayList<>();
+    public ArrayList<Element> elementsMatched = new ArrayList<>();
+    public ArrayList<Compound> compoundsMatched = new ArrayList<>();
+    public ArrayList<String> messageList = new ArrayList<>();
+    public Results results;
     public ViewInteractions interactions;
     public Intent intent;
     public TextView questionText, attemptsText, scoreText;
@@ -46,8 +56,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Game difficulty;
     public Resources res;
     public CountDownTimer timer;
-    long totalTime = 11000;
-    long timeRemaining = 0;
+    public ImageButton contBtn, infoBtn, undoBtn;
+    public boolean isPaused = false, allInputsCorrect = false;
+    public long totalTime = 11000;
+    public long timeRemaining = 0;
     public int
             elementId = 0,
             list_start_x,
@@ -56,6 +68,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             el_width,
             co_width,
             totalScore = 0,
+            multiplier = 1,
             numberOfAttempts = 0,
             attemptLimit = 5;
 
@@ -75,6 +88,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void getDataFromPreviousActivity();
     protected abstract void viewActivityBindings();
     protected abstract void setRequirements();
+    public abstract void beginCountdown();
+    protected abstract int setContBtn();
+    protected abstract int setInfoBtn();
+    protected abstract int setUndoBtn();
 
     /**
      * Todo:
@@ -102,6 +119,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         content = findViewById(getContentLayoutId());
         context = getCurrentContext();
         res = context.getResources();
+
+        contBtn = findViewById(setContBtn());
+        infoBtn = findViewById(setInfoBtn());
+        undoBtn = findViewById(setUndoBtn());
 
         list_start_x = res.getInteger(R.integer.list_start_x);
         list_start_y = res.getInteger(R.integer.list_start_y);
@@ -143,6 +164,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Sets the timer, depending on difficulty however
         setCountdownTimer();
+
+        // Call this abstract method, not all activities will need a timer to start, but much rather
+        // enforce this single line on every activity than forget it on some activities
+        beginCountdown();
 
         // Reacts accordingly to player actions such as attempts or time management
         setAttemptsText();
@@ -228,12 +253,14 @@ public abstract class BaseActivity extends AppCompatActivity {
                 case EASY:
                     totalTime = totalTime + (totalTime / 3);
                     attemptLimit = attemptLimit + 3;
+                    multiplier = multiplier / 2;
                     break;
                 case MEDIUM:
                     break;
                 case HARD:
                     totalTime = totalTime - (totalTime / 3);
                     attemptLimit = attemptLimit - 3;
+                    multiplier = multiplier * 3;
                     break;
             }
         }
@@ -258,10 +285,19 @@ public abstract class BaseActivity extends AppCompatActivity {
             public void onFinish() {
                 if (timerTxt != null)
                     timerTxt.setText("0");
+                if (!isPaused)
+                    getResults();
                 // Todo Executes a method that compares user inputs with the expected inputs, giving points
                 // based on attempts and time left
+                timeRemaining = 0;
             }
-        }.start();
+        };
+    }
+
+    public void startCountdownTimer() {
+        if (timer != null) {
+            timer.start();
+        }
     }
 
     protected void elementFactory() {
@@ -332,6 +368,83 @@ public abstract class BaseActivity extends AppCompatActivity {
         onActivityStart();
     }
 
+    public void getResults() {
+        // Proceed to disable all the touch listeners, to prevent further touches.
+        for (Element el : interactions.getElements()) {
+            el.setOnTouchListener(null);
+        }
+
+        for (Compound co: interactions.getCompounds()) {
+            co.setOnTouchListener(null);
+        }
+
+        // Algorithms to evaluate what the user got correct
+        for (Element el : requiredElements) {
+            if (interactions.getElements().size() > 0) {
+                for (Element e : interactions.getElements()) {
+                    if (e.getName().equals(el.getName())) {
+                        elementsMatched.add(el);
+                    }
+                }
+            }
+        }
+
+        for (Compound co : requiredCompounds) {
+            for (Compound c : interactions.getCompounds()) {
+                if (c.getName().equals(co.getName())) {
+                    compoundsMatched.add(co);
+                }
+            }
+        }
+
+        if (compoundsMatched.size() == requiredCompounds.size() && elementsMatched.size() == requiredElements.size()) {
+            allInputsCorrect = true;
+        } else if (compoundsMatched.size() < requiredCompounds.size()) {
+            for (Compound co : requiredCompounds) {
+                String str = "";
+                for (Element el : co.getElements()) {
+                    int index = co.getElements().indexOf(el);
+
+                    if (index < co.getElements().size()) {
+                        if (index < co.getElements().size() - 1) {
+                            str = str + el.getName() + " + ";
+                        } else {
+                            str = str + el.getName() + " -> " + co.getName();
+                        }
+                    }
+                }
+                messageList.add(str);
+            }
+        }
+
+        String titleText = allInputsCorrect ? "Perfect!" : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect";
+
+        results = new Results(context, titleText, messageList, allInputsCorrect);
+        results.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                moveToNextActivity(getNextActivity());
+                finish();
+                return false;
+            }
+        });
+
+        content.addView(results);
+
+        // Disable all of the relevant buttons.
+        contBtn.setEnabled(false);
+        contBtn.setVisibility(View.INVISIBLE);
+
+        undoBtn.setEnabled(false);
+        undoBtn.setVisibility(View.INVISIBLE);
+
+        infoBtn.setEnabled(false);
+        infoBtn.setVisibility(View.INVISIBLE);
+
+        // Stop the timer
+        timer.cancel();
+    }
+
     // Asks if the user is sure about wanting to close the app
     @Override
     public void onBackPressed() {
@@ -359,5 +472,22 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(sensorListener);
+    }
+
+    public void onNavigateAway() {
+        // If we are navigating away to the guidelines page, pause the timer
+        if (timer != null) {
+            timer.cancel();
+            isPaused = true;
+        }
+    }
+
+    public void onNavigateReturn() {
+        // Resume the timer when we return to the question
+        if (isPaused) {
+            setCountdownTimer();
+            startCountdownTimer();
+            isPaused = false;
+        }
     }
 }

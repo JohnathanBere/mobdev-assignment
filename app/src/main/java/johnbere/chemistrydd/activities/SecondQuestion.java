@@ -3,6 +3,8 @@ package johnbere.chemistrydd.activities;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
@@ -19,6 +21,13 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        startCountdownTimer();
+    }
+
+    @Override
     protected void setRequirements() {}
 
     @Override
@@ -32,11 +41,67 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
-    protected void viewActivityBindings() {}
+    protected void viewActivityBindings() {
+        contBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getResults();
+            }
+        });
+        infoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                questionText.setText(requirements);
+            }
+        });
+        infoBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                moveToNextActivity(new GuideLines());
+                return true;
+            }
+        });
+        undoBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                resetActivityLayout();
+                return false;
+            }
+        });
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void beginCountdown() {
+        startCountdownTimer();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        onNavigateReturn();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        onNavigateAway();
+    }
+
+    @Override
+    protected int setContBtn() {
+        return R.id.contBtnQ2;
+    }
+
+    @Override
+    protected int setInfoBtn() {
+        return R.id.infoBtnQ2;
+    }
+
+    @Override
+    protected int setUndoBtn() {
+        return R.id.undoBtnQ2;
     }
 
     @Override
@@ -55,6 +120,16 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
+    protected int getScoreText() {
+        return R.id.q2Score;
+    }
+
+    @Override
+    protected int getQuestionText() {
+        return R.id.q2Txt;
+    }
+
+    @Override
     protected Context getCurrentContext() {
         return SecondQuestion.this;
     }
@@ -65,17 +140,7 @@ public class SecondQuestion extends BaseActivity {
     }
 
     @Override
-    protected int getScoreText() {
-        return 0;
-    }
-
-    @Override
-    protected int getQuestionText() {
-        return 0;
-    }
-
-    @Override
     public BaseActivity getNextActivity() {
-        return null;
+        return new FinalScreen();
     }
 }

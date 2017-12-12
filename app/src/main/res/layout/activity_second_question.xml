@@ -10,26 +10,25 @@
 
     <TextView
         android:id="@+id/q2Txt"
-        android:layout_width="219dp"
-        android:layout_height="32dp"
-        android:layout_marginBottom="449dp"
-        android:layout_marginEnd="28dp"
-        android:layout_marginStart="20dp"
+        android:layout_width="243dp"
+        android:layout_height="146dp"
+        android:layout_marginBottom="333dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="9dp"
         android:text="TextView"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/q2Info"
+        app:layout_constraintBottom_toTopOf="@+id/infoBtnQ2"
         app:layout_constraintEnd_toStartOf="@+id/q2Timer"
-        app:layout_constraintStart_toEndOf="@+id/q2Attempts"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/q2Attempts" />
 
     <TextView
         android:id="@+id/q2Timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="34dp"
+        android:layout_height="30dp"
         android:layout_marginBottom="449dp"
         android:text="10"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/q2Btn"
+        app:layout_constraintBottom_toTopOf="@+id/contBtnQ2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,39 +36,56 @@
         android:id="@+id/q2Attempts"
         android:layout_width="90dp"
         android:layout_height="23dp"
-        android:layout_marginBottom="458dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginEnd="9dp"
         android:text="Attempts:"
-        app:layout_constraintBottom_toTopOf="@+id/q2Reset"
+        app:layout_constraintBottom_toTopOf="@+id/q2Score"
+        app:layout_constraintEnd_toStartOf="@+id/q2Txt"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/q2Reset"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:text="Reset"
-        android:textSize="8sp"
+    <TextView
+        android:id="@+id/q2Score"
+        android:layout_width="90dp"
+        android:layout_height="23dp"
+        android:layout_marginBottom="426dp"
+        android:text="Score:"
+        app:layout_constraintBottom_toTopOf="@+id/undoBtnQ2"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/infoBtnQ2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="147dp"
+        android:layout_marginStart="147dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/infobtn"
+        android:cropToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/contBtnQ2"
+        app:layout_constraintStart_toEndOf="@+id/undoBtnQ2" />
+
+    <ImageButton
+        android:id="@+id/undoBtnQ2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/resetbtn"
+        android:cropToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/q2Info"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:layout_marginEnd="109dp"
-        android:layout_marginStart="110dp"
-        android:text="Help"
-        android:textSize="8sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/q2Btn"
-        app:layout_constraintStart_toEndOf="@+id/q2Reset" />
-
-    <Button
-        android:id="@+id/q2Btn"
-        android:layout_width="55dp"
-        android:layout_height="30dp"
-        android:text="Submit"
-        android:textSize="8sp"
+    <ImageButton
+        android:id="@+id/contBtnQ2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:adjustViewBounds="false"
+        android:background="@drawable/continuebtn"
+        android:cropToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

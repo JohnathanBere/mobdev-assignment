@@ -15,7 +15,7 @@ import johnbere.chemistrydd.R;
 
 
 /**
- * This class is a helper class that will act as an intermediary between the main activity and the event listeners.
+ * This class is a helper class that will act as an intermediary between the basic activity sub-classes and the event listeners.
  */
 public class ViewInteractions {
     private ArrayList<Element> elements;
@@ -67,7 +67,7 @@ public class ViewInteractions {
                 el.setPrevY(el.getY());
 
                 // check if the reaction created one of the desired elements
-                // Todo evaluate if elements/compounds meet the expected condition.
+                // Todo evaluate if elements/compounds meet the expected condition. by retrieving the results
                 break;
             }
             // If the statement similiar to the previous checks except the element and intersectioned element
@@ -99,7 +99,7 @@ public class ViewInteractions {
                 activity.questionText.setText(failMsg);
 
                 if (activity.numberOfAttempts >= activity.attemptLimit) {
-                    Toast.makeText(activity, "You have tried too many times, just give up", Toast.LENGTH_SHORT).show();
+                    activity.getResults();
 
                     /**
                      * Todo
@@ -107,13 +107,7 @@ public class ViewInteractions {
                      *  reveals the desired outcome if the user got stuff wrong
                      *  or just being correct, refrain from directly going to the next activity without feedback
                      */
-                    if (activity.getNextActivity() != null) {
-                        activity.moveToNextActivity(activity.getNextActivity());
-                        activity.finish();
-                    }
                 }
-
-
                 break;
             }
         }
@@ -137,8 +131,6 @@ public class ViewInteractions {
 
         // Instantiate a new compound, it will contain a list of the reacted elements.
         Compound compound = new Compound(activity, "", "", firstElement.getX(), firstElement.getY(),  this.incr, Color.GREEN, reactants);
-//        Toast.makeText(activity, compound.getName() + " was created!", Toast.LENGTH_SHORT).show();
-
 
         // Properly align the compound to its minimum confines as to not appear clipped when it has been created.
         if (compound.getX() < activity.content.getLeft() + compoundMargins) {
@@ -169,8 +161,6 @@ public class ViewInteractions {
         // Make the parameters equivalent to the property of the view interactions observer
         this.element1 = firstElement;
         this.element2 = secondElement;
-
-        //Log.d("JB", "The new id of the compound is " + compound.getElementId());
 
         compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
 

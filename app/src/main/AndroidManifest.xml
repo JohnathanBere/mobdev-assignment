@@ -23,7 +23,8 @@
         <activity android:name=".activities.FirstQuestion" />
         <activity android:name=".activities.SecondQuestion" />
         <activity android:name=".activities.Difficulty" />
-        <activity android:name=".activities.GuideLines"></activity>
+        <activity android:name=".activities.GuideLines" />
+        <activity android:name=".activities.FinalScreen"></activity>
     </application>
 
 </manifest>

@@ -96,7 +96,23 @@ public class Difficulty extends BaseActivity {
     }
 
     @Override
-    protected void setRequirements() {
+    protected void setRequirements() {}
 
+    @Override
+    protected int setContBtn() {
+        return 0;
     }
+
+    @Override
+    protected int setInfoBtn() {
+        return 0;
+    }
+
+    @Override
+    protected int setUndoBtn() {
+        return 0;
+    }
+
+    @Override
+    public void beginCountdown() {}
 }

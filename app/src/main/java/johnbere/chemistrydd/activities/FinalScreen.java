@@ -8,25 +8,49 @@ import android.widget.Toast;
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 
-public class GuideLines extends BaseActivity {
+public class FinalScreen extends BaseActivity {
+
     @Override
-    public void onBackPressed() {
-        finish();
+    protected void viewActivityBindings() {
+
+    }
+
+    @Override
+    protected void setRequirements() {
+
+    }
+
+    @Override
+    protected int setContBtn() {
+        return 0;
+    }
+
+    @Override
+    protected int setInfoBtn() {
+        return 0;
+    }
+
+    @Override
+    protected int setUndoBtn() {
+        return 0;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Make sure the timer does not begin running, an exception will form other wise...
+        timer.cancel();
     }
 
     @Override
     protected int getResourceLayoutId() {
-        return R.layout.activity_guide_lines;
+        return R.layout.activity_final_screen;
     }
 
     @Override
     protected int getContentLayoutId() {
-        return R.id.content_guidelines;
+        return R.id.content_final_screen;
     }
 
     @Override
@@ -51,7 +75,7 @@ public class GuideLines extends BaseActivity {
 
     @Override
     protected Context getCurrentContext() {
-        return GuideLines.this;
+        return FinalScreen.this;
     }
 
     @Override
@@ -60,33 +84,18 @@ public class GuideLines extends BaseActivity {
     }
 
     @Override
-    protected void addElementsToLists() {}
+    protected void addElementsToLists() {
 
-    @Override
-    protected void pushDataToNextActivity() {}
-
-    @Override
-    protected void getDataFromPreviousActivity() {}
-
-    @Override
-    protected void viewActivityBindings() {}
-
-    @Override
-    protected void setRequirements() {}
-
-    @Override
-    protected int setContBtn() {
-        return 0;
     }
 
     @Override
-    protected int setInfoBtn() {
-        return 0;
+    protected void pushDataToNextActivity() {
+
     }
 
     @Override
-    protected int setUndoBtn() {
-        return 0;
+    protected void getDataFromPreviousActivity() {
+
     }
 
     @Override
