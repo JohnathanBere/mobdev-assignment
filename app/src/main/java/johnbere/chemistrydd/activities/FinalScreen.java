@@ -3,22 +3,72 @@ package johnbere.chemistrydd.activities;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
+import johnbere.chemistrydd.helpers.Grade;
 
+// Todo 13/12 delgate the scores of how the user did performance-wise
+// Todo 13/12 add logic for calculating the score in getResults
+// Todo 13/12 add new page
 public class FinalScreen extends BaseActivity {
+    TextView grade, resultsTxt;
+    float scorePercentage;
 
     @Override
     protected void viewActivityBindings() {
+        grade = findViewById(R.id.grade);
+        grade.setTextSize(200);
 
+        resultsTxt = findViewById(R.id.resultsText);
+
+        scorePercentage = totalScore / maxPossibleScore * 100;
+
+        if (scorePercentage <= 100 && scorePercentage >= 76){
+            grade.setText(Grade.A.toString());
+            resultsTxt.setText("Excellent!");
+        }
+        else if(scorePercentage <= 75 && scorePercentage >= 66) {
+            grade.setText(Grade.B.toString());
+            resultsTxt.setText("Pretty good!");
+        }
+        else if(scorePercentage <= 65 && scorePercentage >= 56) {
+            grade.setText(Grade.C.toString());
+            resultsTxt.setText("Decent!");
+        }
+        else if(scorePercentage <= 55 && scorePercentage >= 46) {
+            grade.setText(Grade.D.toString());
+            resultsTxt.setText("Uh oh...");
+        }
+        else if(scorePercentage <= 36 && scorePercentage >= 45) {
+            grade.setText(Grade.E.toString());
+            resultsTxt.setText("Not looking good");
+        }
+        else if(scorePercentage <= 35 && scorePercentage >= 0) {
+            grade.setText(Grade.F.toString());
+            resultsTxt.setText("Try again!");
+        }
     }
 
     @Override
-    protected void setRequirements() {
-
+    protected void getDataFromPreviousActivity() {
+        retrieveDifficultyData();
     }
+
+    @Override
+    protected Context getCurrentContext() {
+        return FinalScreen.this;
+    }
+
+    @Override
+    public BaseActivity getNextActivity() {
+        return null;
+    }
+
+    @Override
+    protected void setRequirements() {}
 
     @Override
     protected int setContBtn() {
@@ -74,29 +124,10 @@ public class FinalScreen extends BaseActivity {
     }
 
     @Override
-    protected Context getCurrentContext() {
-        return FinalScreen.this;
-    }
+    protected void addElementsToLists() {}
 
     @Override
-    public BaseActivity getNextActivity() {
-        return null;
-    }
-
-    @Override
-    protected void addElementsToLists() {
-
-    }
-
-    @Override
-    protected void pushDataToNextActivity() {
-
-    }
-
-    @Override
-    protected void getDataFromPreviousActivity() {
-
-    }
+    protected void pushDataToNextActivity() {}
 
     @Override
     public void beginCountdown() {}

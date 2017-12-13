@@ -74,11 +74,12 @@ public abstract class BaseActivity extends AppCompatActivity {
             co_width,
             numberOfAttempts = 0,
             attemptLimit = 5;
-    public float multiplier = 1, totalScore = 0;
+    public float multiplier = 1, totalScore = 0, maxPossibleScore = 0;
 
     // Abstract methods that will be overridden by the sub-classes
     // Ensuring consistency with the helper classes the require activities of type
-    // BaseActivity for proper functionality
+    // BaseActivity for proper functionality in the EventListener and ViewInteractions
+    // Helper classes
     protected abstract int getResourceLayoutId();
     protected abstract int getContentLayoutId();
     protected abstract int getTimerText();
@@ -176,6 +177,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         // Reacts accordingly to player actions such as attempts or time management
         setAttemptsText();
 
+        // Calculate maximum possible points per page to delegate a grade from.
+        scoreFactory();
+
         if (scoreText != null) {
             String scoreStr = String.format(res.getString(R.string.totalScore), totalScore);
             scoreText.setText("Score: " + totalScore);
@@ -251,11 +255,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void pushDifficultyData() {
         intent.putExtra("GameDifficulty", difficulty);
         intent.putExtra("TotalScore", totalScore);
+        intent.putExtra("MaxPossibleScore", maxPossibleScore);
     }
 
     protected void retrieveDifficultyData() {
         difficulty = (Game)getIntent().getSerializableExtra("GameDifficulty");
         totalScore = getIntent().getExtras() != null ? getIntent().getExtras().getFloat("TotalScore") : 0;
+        maxPossibleScore = getIntent().getExtras() != null ? getIntent().getExtras().getFloat("MaxPossibleScore") : 0;
     }
 
     protected void difficultySettings() {
@@ -338,6 +344,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
 
         content.setOnDragListener(new EventListeners(this).LayoutDragListener);
+    }
+
+    protected void scoreFactory() {
+        if (requiredElements.size() > 0) {
+            for (Element el : requiredElements) {
+                maxPossibleScore = maxPossibleScore + multiplier;
+            }
+        }
+
+        if (requiredCompounds.size() > 0) {
+            for (Compound co : requiredCompounds) {
+                maxPossibleScore = maxPossibleScore + multiplier;
+            }
+        }
     }
 
     // Guarantees the distance of separation between elements/compounds
@@ -430,34 +450,30 @@ public abstract class BaseActivity extends AppCompatActivity {
         // These two algorithms will add points if the required element or compound is in any of the pots that the
         // user  made
         // They will also highlight any missing compounds or elements
-//        if (compoundsMatched.size() < requiredCompounds.size()) {
-            for (Compound co : requiredCompounds) {
-                if (compoundsMatched.size() > 0) {
-                    if (!compoundsMatched.contains(co)) {
-                        compoundFormulaProcessor(co);
-                    } else if (compoundsMatched.contains(co)){
-                        totalScore = totalScore + multiplier;
-                    }
-                } else {
+        for (Compound co : requiredCompounds) {
+            if (compoundsMatched.size() > 0) {
+                if (!compoundsMatched.contains(co)) {
                     compoundFormulaProcessor(co);
+                } else if (compoundsMatched.contains(co)){
+                    totalScore = totalScore + multiplier;
                 }
+            } else {
+                compoundFormulaProcessor(co);
             }
-//        }
+        }
 
-//        if (elementsMatched.size() < requiredElements.size()) {
-            for (Element el : requiredElements) {
-                if (elementsMatched.size() > 0) {
-                    if (!elementsMatched.contains(el)) {
-                        elementFormulaProcessor(el);
-                    } else if (elementsMatched.contains(el)) {
-                        // add a point
-                        totalScore = totalScore + multiplier;
-                    }
-                } else {
-                   elementFormulaProcessor(el);
+        for (Element el : requiredElements) {
+            if (elementsMatched.size() > 0) {
+                if (!elementsMatched.contains(el)) {
+                    elementFormulaProcessor(el);
+                } else if (elementsMatched.contains(el)) {
+                    // add a point
+                    totalScore = totalScore + multiplier;
                 }
+            } else {
+               elementFormulaProcessor(el);
             }
-//        }
+        }
 
         // Add the score to the title text, better UX and it's just easier...
         String titleText = allInputsCorrect ? "Perfect! Score: " + totalScore : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect, Score: " + totalScore;

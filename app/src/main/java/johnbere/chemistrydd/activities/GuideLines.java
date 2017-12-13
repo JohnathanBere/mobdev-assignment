@@ -15,11 +15,6 @@ public class GuideLines extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     protected int getResourceLayoutId() {
         return R.layout.activity_guide_lines;
     }
@@ -57,6 +52,11 @@ public class GuideLines extends BaseActivity {
     @Override
     public BaseActivity getNextActivity() {
         return null;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
