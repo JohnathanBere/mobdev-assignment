@@ -15,7 +15,7 @@ public class ShakeEventListener implements SensorEventListener {
     private static final int MIN_FORCE = 5;
 
     // Minimum required number of shakes
-    private static final int MIN_DIRECTION_CHANGE = 3;
+    private static final int MIN_DIRECTION_CHANGE = 2;
 
     // Maximum pause between movements
     private static final int MAX_PAUSE_BETWEEN_DIRECTION_CHANGE = 500;

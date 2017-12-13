@@ -1,4 +1,4 @@
-package johnbere.chemistrydd;
+package johnbere.chemistrydd.elements;
 
 import android.content.ClipData;
 import android.content.Context;
@@ -9,16 +9,14 @@ import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
+import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.helpers.*;
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
 
 /**
- * This class is a game object, that can be dragged and dropped
- * Todo
- * 1. If needed, begin subclassing this view, namely for combinations of availableElements
- * 2. Add other properties like element type, group etc.
- * 3. Proceed to add instances of this class to an ArrayAdapter class (written somewhere else)
+ * This class is a game object, that can be dragged and dropped. It has its own touch handle, that triggers a drag event.
  */
 public class Element extends View {
     // Set basic information about the element such as its name and formula
@@ -28,7 +26,7 @@ public class Element extends View {
     private Rectangle r;
     private Rect rect;
     private int elementId, color, shapeRadius;
-    private float x, y;
+    private float x, y, prevX, prevY;
     private ElementGroup group;
 
     public boolean handleTouch(View v, MotionEvent event) {
@@ -64,6 +62,10 @@ public class Element extends View {
         formulaColor = new Paint();
         shapeColor = new Paint();
         rectColor = new Paint();
+
+        // Need to store the previous coordinates so the element can revert back to its position
+        this.prevX = x;
+        this.prevY = y;
 
         // This will act as an internal stencil for the rect property to begin drawing around the Element bubble.
         r = new Rectangle();
@@ -143,6 +145,22 @@ public class Element extends View {
     @Override
     public void setY(float y) {
         this.y = y;
+    }
+
+    public float getPrevX() {
+        return this.prevX;
+    }
+
+    public void setPrevX(float prevX) {
+        this.prevX = prevX;
+    }
+
+    public float getPrevY() {
+        return this.prevY;
+    }
+
+    public void setPrevY(float prevY) {
+        this.prevY = prevY;
     }
 
     public int getSquareY() {
