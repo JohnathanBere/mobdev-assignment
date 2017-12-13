@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,8 +142,8 @@ public class Compound extends Element {
         @Override
         public boolean onDoubleTap(MotionEvent event) {
             setSplitFlag();
-            String message = getSplitFlag() ? " is marked to split" : " is not going to split";
-            // Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
+            String message = getSplitFlag() ? " is marked to split, shake the screen" : " is not going to split";
+            Toast.makeText(getContext(), getName() + message, Toast.LENGTH_SHORT).show();
             return true;
         }
 

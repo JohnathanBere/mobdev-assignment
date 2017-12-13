@@ -3,6 +3,8 @@ package johnbere.chemistrydd.activities;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,10 +15,12 @@ import johnbere.chemistrydd.helpers.Grade;
 public class FinalScreen extends BaseActivity {
     TextView grade, resultsTxt;
     float scorePercentage;
+    Button retryQuiz;
 
     @Override
     protected void viewActivityBindings() {
         grade = findViewById(R.id.grade);
+        retryQuiz = findViewById(R.id.retry);
         grade.setTextSize(200);
 
         resultsTxt = findViewById(R.id.resultsText);
@@ -53,6 +57,15 @@ public class FinalScreen extends BaseActivity {
             grade.setText("?");
             resultsTxt.setText("You did so bad, it made a negative score!");
         }
+
+        retryQuiz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Properly dispose of everything else if the app glitches out
+                moveToNextActivity(getNextActivity());
+                finish();
+            }
+        });
     }
 
     @Override
@@ -67,7 +80,7 @@ public class FinalScreen extends BaseActivity {
 
     @Override
     public BaseActivity getNextActivity() {
-        return null;
+        return new MainActivity();
     }
 
     @Override

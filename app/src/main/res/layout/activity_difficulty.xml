@@ -65,7 +65,7 @@
         android:layout_marginEnd="89dp"
         android:layout_marginStart="89dp"
         android:layout_marginTop="14dp"
-        android:text="Your time and number of available attempts will be affected"
+        android:text="Your time, score and number of available attempts will be affected"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

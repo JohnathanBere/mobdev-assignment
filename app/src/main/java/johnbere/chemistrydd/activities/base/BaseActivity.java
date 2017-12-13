@@ -508,7 +508,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Do the calculations for delegating points now
         if (totalScore > 0) {
-            float timeDiff = (initialLength - timeRemaining) / 1000;
+            float timeDiff = ((initialLength - timeRemaining) / 1000) * multiplier;
             float rawScore = totalScore * 100;
             rawScore = rawScore - timeDiff - numberOfAttempts;
             totalScore = rawScore / 100;
