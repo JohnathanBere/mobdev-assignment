@@ -3,6 +3,7 @@ package johnbere.chemistrydd.helpers;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,6 @@ public class EventListeners {
 
             switch(action) {
                 case DragEvent.ACTION_DRAG_STARTED:
-                    //Log.d("JB", "Something is being dragged? Is it " + el.getName() + "?");
                     String dragMsg = String.format(activity.res.getString(R.string.draggingAction), el.getName());
                     activity.questionText.setText(dragMsg);
                     float new_x;
@@ -44,19 +44,18 @@ public class EventListeners {
                 // Set the dragged element to being invisible when the dragging has been initiated
                 case DragEvent.ACTION_DRAG_ENTERED:
                     el.setVisibility(View.INVISIBLE);
-                    // Toast.makeText(activity, "Dragging " + el.getName(), Toast.LENGTH_SHORT).show();
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
-                    //Log.d("JB", "The dragging of " + el.getName() + " ended lol");
                     return false;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
+                    if (getActivity().hasTimerFinished) {
+                        Toast.makeText(getActivity(), "You really shouldn't be dragging that", Toast.LENGTH_SHORT).show();
+                    }
                     return false;
 
                 case DragEvent.ACTION_DROP:
-                    // Log.d("JB", "The new location of " + el.getName() + " puts it at around " + event.getX() + " by " + event.getY());
-
                     // Error, when you drop outside of the main layout, the element disappears.
                     // This issue has been fixed, the element shadow returns to the original position
                     // of the element
@@ -155,7 +154,6 @@ public class EventListeners {
             // the collection should be empty after a shake has occurred.
             splitCompounds.clear();
             separateMsg = "Retrieved ";
-            // Todo evaluate if elements/compounds meet the expected condition.
         }
 
         // Compounds primed for a split will be added to the split collection for deletion

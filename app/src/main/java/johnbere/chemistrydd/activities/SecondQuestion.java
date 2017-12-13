@@ -31,7 +31,6 @@ public class SecondQuestion extends BaseActivity {
         availableCompounds.add(new Compound(context, "Lithium Chloride", "LiCl", list_start_x + getPositionOffset(co_width), list_start_y, elementId++, Color.GREEN, liCl));
     }
 
-    // Todo 12/12 Be rigorous regarding substance requirements.
     @Override
     protected void setRequirements() {
         requiredElements.add(new Element(context, "Hydrogen", "H", 0, 0, 34, 0, ElementGroup.HYDROGEN));

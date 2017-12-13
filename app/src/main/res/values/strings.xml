@@ -25,5 +25,5 @@
     <string name="shakeSeparateAction">Separated</string>
     <string name="shakeResultAction">Retrieved</string>
 
-    <string name="totalScore">Score: %f</string>
+    <string name="totalScore">Score: %s</string>
 </resources>

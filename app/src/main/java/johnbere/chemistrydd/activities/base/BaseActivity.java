@@ -37,7 +37,6 @@ import johnbere.chemistrydd.views.Results;
 
 // use a difficulty setting (Before the first question) that determines the time taken and attempts made
 // determining the scores a user gets
-// Todo 12/12 Finally add a scores page that gives a grade based on points and difficulty.
 public abstract class BaseActivity extends AppCompatActivity {
     public SensorManager sensorManager;
     public ShakeEventListener sensorListener;
@@ -62,8 +61,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Resources res;
     public CountDownTimer timer;
     public ImageButton contBtn, infoBtn, undoBtn;
-    public boolean isPaused = false, allInputsCorrect = false;
-    public long totalTime = 11000;
+    public boolean isPaused = false, allInputsCorrect = false, hasTimerFinished = false, wereAttemptsExceeded = false;
+    public long totalTime = 11000, initialLength = 11000;
     public long timeRemaining = 0;
     public int
             elementId = 0,
@@ -73,7 +72,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             el_width,
             co_width,
             numberOfAttempts = 0,
-            attemptLimit = 5;
+            attemptLimit = 5,
+            attemptsRemaining;
     public float multiplier = 1, totalScore = 0, maxPossibleScore = 0;
 
     // Abstract methods that will be overridden by the sub-classes
@@ -99,7 +99,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract int setUndoBtn();
 
     /**
-     * Todo:
      * Create an abstract method that sets up the desired compounds / elements
      * Create a method here that evaluates if the current compounds / elements match the desired outcome
      * Also, the result screen should trigger at different times: When time has run out, when the number have attempts
@@ -181,14 +180,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         scoreFactory();
 
         if (scoreText != null) {
-            String scoreStr = String.format(res.getString(R.string.totalScore), totalScore);
-            scoreText.setText("Score: " + totalScore);
+            DecimalFormat formatter = new DecimalFormat("0.00");
+            String formattedScore = formatter.format(totalScore);
+            String scoreStr = String.format(res.getString(R.string.totalScore), formattedScore);
+            scoreText.setText(scoreStr);
         }
     }
 
     protected void setAttemptsText() {
         if (attemptsText != null) {
-            attemptsMessage = String.format(res.getString(R.string.attempts), numberOfAttempts);
+            attemptsRemaining = attemptLimit;
+            attemptsMessage = String.format(res.getString(R.string.attempts), attemptsRemaining);
             attemptsText.setText(attemptsMessage);
         }
     }
@@ -207,7 +209,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void textMessageProcessor() {
-        // Todo store this in a method. Proceed to do the same with the elements
         // This loop processes the list of requests that the game will ask of the user.
         for (Compound co : requiredCompounds) {
             int index = requiredCompounds.indexOf(co);
@@ -280,6 +281,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                     multiplier = multiplier * 3;
                     break;
             }
+            initialLength = totalTime;
         }
     }
 
@@ -300,12 +302,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+                hasTimerFinished = true;
                 if (timerTxt != null)
                     timerTxt.setText("0");
                 if (!isPaused)
                     getResults();
-                // Todo Executes a method that compares user inputs with the expected inputs, giving points
-                // based on attempts and time left
                 timeRemaining = 0;
             }
         };
@@ -346,6 +347,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         content.setOnDragListener(new EventListeners(this).LayoutDragListener);
     }
 
+    // Calculate the theoretical possible max score a user can get for each question.
+    // This will be measured against what they actually got to give a grade.
     protected void scoreFactory() {
         if (requiredElements.size() > 0) {
             for (Element el : requiredElements) {
@@ -399,20 +402,32 @@ public abstract class BaseActivity extends AppCompatActivity {
         onActivityStart();
     }
 
-    // Todo 12/12 resume work for proper processing of the required elements
+    // Look at this massive function that should really be broken down to smaller functions that do their own thing.
+    // Time be damned hahahaha
     public void getResults() {
+        // Declare some hashsets that will be necessary for dealing with duplicate data.
         Set<Element> dedupedElements;
         Set<Compound> dedupedCompounds;
+
+        // If the number of attempts were exceeded, the user gets no score.
+        if (wereAttemptsExceeded) {
+            multiplier = 0;
+        }
 
         // Proceed to disable all the touch listeners, to prevent further touches.
         for (Element el : interactions.getElements()) {
             el.setOnTouchListener(null);
+            el.setVisibility(View.INVISIBLE);
+            el.invalidate();
         }
 
         for (Compound co: interactions.getCompounds()) {
             co.setOnTouchListener(null);
+            co.setVisibility(View.INVISIBLE);
+            co.invalidate();
         }
 
+        content.setOnDragListener(null);
         sensorManager.unregisterListener(sensorListener);
 
         // Algorithms to evaluate what the user got correct
@@ -429,7 +444,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-        // Todo 12/12 make sure points are added for every matched substance.
         for (Compound co : requiredCompounds) {
             if (interactions.getCompounds().size() > 0) {
                 for (Compound c : interactions.getCompounds()) {
@@ -454,7 +468,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (compoundsMatched.size() > 0) {
                 if (!compoundsMatched.contains(co)) {
                     compoundFormulaProcessor(co);
-                } else if (compoundsMatched.contains(co)){
+                } else if (compoundsMatched.contains(co) && multiplier > 0){
                     totalScore = totalScore + multiplier;
                 }
             } else {
@@ -466,7 +480,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (elementsMatched.size() > 0) {
                 if (!elementsMatched.contains(el)) {
                     elementFormulaProcessor(el);
-                } else if (elementsMatched.contains(el)) {
+                } else if (elementsMatched.contains(el) && multiplier > 0) {
                     // add a point
                     totalScore = totalScore + multiplier;
                 }
@@ -474,21 +488,6 @@ public abstract class BaseActivity extends AppCompatActivity {
                elementFormulaProcessor(el);
             }
         }
-
-        // Add the score to the title text, better UX and it's just easier...
-        String titleText = allInputsCorrect ? "Perfect! Score: " + totalScore : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect, Score: " + totalScore;
-
-        results = new Results(context, titleText, messageList, allInputsCorrect);
-        results.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                moveToNextActivity(getNextActivity());
-                finish();
-                return false;
-            }
-        });
-
-        content.addView(results);
 
         // Disable all of the relevant buttons.
         contBtn.setEnabled(false);
@@ -502,6 +501,35 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         // Stop the timer
         timer.cancel();
+
+        if (hasTimerFinished) {
+            timeRemaining = 0;
+        }
+
+        // Do the calculations for delegating points now
+        if (totalScore > 0) {
+            float timeDiff = (initialLength - timeRemaining) / 1000;
+            float rawScore = totalScore * 100;
+            rawScore = rawScore - timeDiff - numberOfAttempts;
+            totalScore = rawScore / 100;
+        }
+
+        // Add the score to the title text, better UX and it's just easier...
+        DecimalFormat formatter = new DecimalFormat("0.00");
+        String formattedScore = formatter.format(totalScore);
+        String titleText = allInputsCorrect ? "Perfect! Score: " + formattedScore : elementsMatched.size() == 0 && compoundsMatched.size() == 0 ? "Got to do better" : "Incorrect, Score: " + formattedScore;
+
+        // Generate results window
+        results = new Results(context, titleText, messageList, allInputsCorrect);
+        results.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                moveToNextActivity(getNextActivity());
+                finish();
+                return false;
+            }
+        });
+        content.addView(results);
     }
 
     protected void compoundFormulaProcessor(Compound co) {

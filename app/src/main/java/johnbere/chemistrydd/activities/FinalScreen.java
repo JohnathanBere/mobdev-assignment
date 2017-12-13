@@ -10,9 +10,6 @@ import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.helpers.Grade;
 
-// Todo 13/12 delgate the scores of how the user did performance-wise
-// Todo 13/12 add logic for calculating the score in getResults
-// Todo 13/12 add new page
 public class FinalScreen extends BaseActivity {
     TextView grade, resultsTxt;
     float scorePercentage;
@@ -25,6 +22,8 @@ public class FinalScreen extends BaseActivity {
         resultsTxt = findViewById(R.id.resultsText);
 
         scorePercentage = totalScore / maxPossibleScore * 100;
+
+//        Toast.makeText(context, "score percentage: " + scorePercentage + "%", Toast.LENGTH_SHORT).show();
 
         if (scorePercentage <= 100 && scorePercentage >= 76){
             grade.setText(Grade.A.toString());
@@ -42,13 +41,17 @@ public class FinalScreen extends BaseActivity {
             grade.setText(Grade.D.toString());
             resultsTxt.setText("Uh oh...");
         }
-        else if(scorePercentage <= 36 && scorePercentage >= 45) {
+        else if(scorePercentage <= 45 && scorePercentage >= 36) {
             grade.setText(Grade.E.toString());
             resultsTxt.setText("Not looking good");
         }
         else if(scorePercentage <= 35 && scorePercentage >= 0) {
             grade.setText(Grade.F.toString());
             resultsTxt.setText("Try again!");
+        }
+        else {
+            grade.setText("?");
+            resultsTxt.setText("You did so bad, it made a negative score!");
         }
     }
 

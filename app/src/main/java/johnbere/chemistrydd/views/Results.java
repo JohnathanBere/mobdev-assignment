@@ -89,7 +89,7 @@ public class Results extends View {
                     canvas.drawText("...Touch to continue", (float)(panel.left + 15), (float)(paneHeading.top + 200 + (200 * (i + 1))), solutionTextColor);
                 }
             }
-            panel.bottom = panel.top + (this.solutionText.size() * 350);
+            panel.bottom = panel.top + (this.solutionText.size() * 450);
             this.invalidate();
         }
         if (this.solutionText.size() == 0) {

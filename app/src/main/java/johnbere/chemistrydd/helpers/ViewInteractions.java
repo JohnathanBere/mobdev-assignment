@@ -2,12 +2,9 @@ package johnbere.chemistrydd.helpers;
 
 import android.graphics.Color;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import johnbere.chemistrydd.activities.FirstQuestion;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
@@ -67,7 +64,6 @@ public class ViewInteractions {
                 el.setPrevY(el.getY());
 
                 // check if the reaction created one of the desired elements
-                // Todo evaluate if elements/compounds meet the expected condition. by retrieving the results
                 break;
             }
             // If the statement similiar to the previous checks except the element and intersectioned element
@@ -91,22 +87,16 @@ public class ViewInteractions {
                 el.setSquareY((int)el.getPrevY());
                 el.reCalculateCoord();
 
-                // Todo Remember to update the counter of the activity attempts
+                activity.attemptsRemaining--;
                 activity.numberOfAttempts++;
-                String attemptsMessage = String.format(activity.res.getString(R.string.attempts), activity.numberOfAttempts);
+                String attemptsMessage = String.format(activity.res.getString(R.string.attempts), activity.attemptsRemaining);
                 activity.attemptsText.setText(attemptsMessage);
                 String failMsg = String.format(activity.res.getString(R.string.draggingFailedAction), el.getName(), element.getName());
                 activity.questionText.setText(failMsg);
 
-                if (activity.numberOfAttempts >= activity.attemptLimit) {
+                if (activity.attemptsRemaining <= 0) {
+                    activity.wereAttemptsExceeded = true;
                     activity.getResults();
-
-                    /**
-                     * Todo
-                     *  Try to come up with a results panel for that question that
-                     *  reveals the desired outcome if the user got stuff wrong
-                     *  or just being correct, refrain from directly going to the next activity without feedback
-                     */
                 }
                 break;
             }
