@@ -12,26 +12,22 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
-import johnbere.chemistrydd.helpers.EventListeners;
-import johnbere.chemistrydd.helpers.Game;
-import johnbere.chemistrydd.helpers.ShakeEventListener;
+import johnbere.chemistrydd.helpers.enums.Game;
+import johnbere.chemistrydd.helpers.eventlisteners.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
 import johnbere.chemistrydd.views.Results;
 
@@ -147,7 +143,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         sensorListener = new ShakeEventListener();
-        sensorListener.setOnShakeListener(new EventListeners(this).OnShakeListener);
+        sensorListener.setOnShakeListener(new ShakeEventListener.EventListeners(this).OnShakeListener);
 
         interactions = new ViewInteractions(this);
 
@@ -253,13 +249,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void pushDifficultyData() {
+    protected void pushDifficultyAndScoreData() {
         intent.putExtra("GameDifficulty", difficulty);
         intent.putExtra("TotalScore", totalScore);
         intent.putExtra("MaxPossibleScore", maxPossibleScore);
     }
 
-    protected void retrieveDifficultyData() {
+    protected void retrieveDifficultyAndScoreData() {
         difficulty = (Game)getIntent().getSerializableExtra("GameDifficulty");
         totalScore = getIntent().getExtras() != null ? getIntent().getExtras().getFloat("TotalScore") : 0;
         maxPossibleScore = getIntent().getExtras() != null ? getIntent().getExtras().getFloat("MaxPossibleScore") : 0;
@@ -332,19 +328,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         // in the base class and then be called.
         if (availableElements.size() > 0) {
             for (Element el : availableElements) {
-                el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+                el.setOnTouchListener(new ShakeEventListener.EventListeners(this).ElementTouchListener);
                 content.addView(el);
             }
         }
 
         if (availableCompounds.size() > 0) {
             for (Compound co : availableCompounds) {
-                co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
+                co.setOnTouchListener(new ShakeEventListener.EventListeners(this).ElementTouchListener);
                 content.addView(co);
             }
         }
 
-        content.setOnDragListener(new EventListeners(this).LayoutDragListener);
+        content.setOnDragListener(new ShakeEventListener.EventListeners(this).LayoutDragListener);
     }
 
     // Calculate the theoretical possible max score a user can get for each question.

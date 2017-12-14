@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
-import johnbere.chemistrydd.helpers.Game;
+import johnbere.chemistrydd.helpers.enums.Game;
 
 public class Difficulty extends BaseActivity {
     Button easy, medium, hard;
@@ -31,7 +31,7 @@ public class Difficulty extends BaseActivity {
 
     @Override
     protected void pushDataToNextActivity() {
-        pushDifficultyData();
+        pushDifficultyAndScoreData();
     }
 
     @Override

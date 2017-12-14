@@ -9,11 +9,9 @@ import android.graphics.Rect;
 import android.support.constraint.solver.widgets.Rectangle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import johnbere.chemistrydd.activities.base.BaseActivity;
-import johnbere.chemistrydd.helpers.*;
 import johnbere.chemistrydd.helpers.ShapeShadowBuilder;
+import johnbere.chemistrydd.helpers.enums.ElementGroup;
 
 /**
  * This class is a game object, that can be dragged and dropped. It has its own touch handle, that triggers a drag event.

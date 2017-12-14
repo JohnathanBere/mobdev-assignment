@@ -9,6 +9,7 @@ import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
+import johnbere.chemistrydd.helpers.eventlisteners.ShakeEventListener;
 
 
 /**
@@ -152,7 +153,7 @@ public class ViewInteractions {
         this.element1 = firstElement;
         this.element2 = secondElement;
 
-        compound.setOnTouchListener(new EventListeners(activity).ElementTouchListener);
+        compound.setOnTouchListener(new ShakeEventListener.EventListeners(activity).ElementTouchListener);
 
         activity.content.addView(compound);
 
@@ -167,7 +168,7 @@ public class ViewInteractions {
     /**
      * Updates the element in a list
      */
-    void updateElementInList(View param) {
+    public void updateElementInList(View param) {
         Element castEl = (Element)param;
         for (Element element : this.elements) {
             // add this to the if statement otherwise el.getName().equals(element.getName())

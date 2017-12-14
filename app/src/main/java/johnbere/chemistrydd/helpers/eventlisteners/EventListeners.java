@@ -1,4 +1,4 @@
-package johnbere.chemistrydd.helpers;
+package johnbere.chemistrydd.helpers.eventlisteners;
 
 import android.view.DragEvent;
 import android.view.MotionEvent;

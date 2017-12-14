@@ -3,10 +3,7 @@ package johnbere.chemistrydd.activities;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -14,22 +11,16 @@ import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
-import johnbere.chemistrydd.helpers.ElementGroup;
-import johnbere.chemistrydd.views.Results;
+import johnbere.chemistrydd.helpers.enums.ElementGroup;
 
 public class FirstQuestion extends BaseActivity {
     protected void pushDataToNextActivity() {
-        // int val = 123
-        // intent.putExtra("numbah", val)
-        pushDifficultyData();
+        pushDifficultyAndScoreData();
     }
 
     @Override
     protected void getDataFromPreviousActivity() {
-        // Bundle extras = getIntent().getExtras()
-        // if (extras != null) { int val = extras.getInt("numbah") }
-        retrieveDifficultyData();
-        // Toast.makeText(context, difficulty.toString(), Toast.LENGTH_SHORT).show();
+        retrieveDifficultyAndScoreData();
     }
 
     @Override

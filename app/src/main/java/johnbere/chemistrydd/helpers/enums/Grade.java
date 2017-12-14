@@ -1,4 +1,4 @@
-package johnbere.chemistrydd.helpers;
+package johnbere.chemistrydd.helpers.enums;
 
 public enum Grade {
     A,

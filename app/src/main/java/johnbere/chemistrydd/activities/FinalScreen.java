@@ -1,16 +1,14 @@
 package johnbere.chemistrydd.activities;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
-import johnbere.chemistrydd.helpers.Grade;
+import johnbere.chemistrydd.helpers.enums.Grade;
 
 public class FinalScreen extends BaseActivity {
     TextView grade, resultsTxt;
@@ -70,7 +68,7 @@ public class FinalScreen extends BaseActivity {
 
     @Override
     protected void getDataFromPreviousActivity() {
-        retrieveDifficultyData();
+        retrieveDifficultyAndScoreData();
     }
 
     @Override

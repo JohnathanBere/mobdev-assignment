@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -12,7 +11,7 @@ import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.activities.base.BaseActivity;
 import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
-import johnbere.chemistrydd.helpers.ElementGroup;
+import johnbere.chemistrydd.helpers.enums.ElementGroup;
 
 public class SecondQuestion extends BaseActivity {
     @Override
@@ -50,12 +49,12 @@ public class SecondQuestion extends BaseActivity {
 
     @Override
     protected void pushDataToNextActivity() {
-        pushDifficultyData();
+        pushDifficultyAndScoreData();
     }
 
     @Override
     protected void getDataFromPreviousActivity() {
-        retrieveDifficultyData();
+        retrieveDifficultyAndScoreData();
     }
 
     @Override
@@ -96,14 +95,12 @@ public class SecondQuestion extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
         onNavigateReturn();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
         onNavigateAway();
     }
 

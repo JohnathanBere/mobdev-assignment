@@ -1,4 +1,4 @@
-package johnbere.chemistrydd.helpers;
+package johnbere.chemistrydd.helpers.enums;
 
 public enum ElementGroup {
     // There are 18 groups, only use the one you need

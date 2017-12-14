@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import johnbere.chemistrydd.helpers.ElementGroup;
+import johnbere.chemistrydd.helpers.enums.ElementGroup;
 
 /**
  * Do bear in mind, that compounds may also contain other compounds.
