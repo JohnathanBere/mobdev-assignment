@@ -27,6 +27,7 @@ import johnbere.chemistrydd.elements.Compound;
 import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 import johnbere.chemistrydd.helpers.enums.Game;
+import johnbere.chemistrydd.helpers.eventlisteners.EventListeners;
 import johnbere.chemistrydd.helpers.eventlisteners.ShakeEventListener;
 import johnbere.chemistrydd.helpers.ViewInteractions;
 import johnbere.chemistrydd.views.Results;
@@ -143,7 +144,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         sensorListener = new ShakeEventListener();
-        sensorListener.setOnShakeListener(new ShakeEventListener.EventListeners(this).OnShakeListener);
+        sensorListener.setOnShakeListener(new EventListeners(this).OnShakeListener);
 
         interactions = new ViewInteractions(this);
 
@@ -328,19 +329,19 @@ public abstract class BaseActivity extends AppCompatActivity {
         // in the base class and then be called.
         if (availableElements.size() > 0) {
             for (Element el : availableElements) {
-                el.setOnTouchListener(new ShakeEventListener.EventListeners(this).ElementTouchListener);
+                el.setOnTouchListener(new EventListeners(this).ElementTouchListener);
                 content.addView(el);
             }
         }
 
         if (availableCompounds.size() > 0) {
             for (Compound co : availableCompounds) {
-                co.setOnTouchListener(new ShakeEventListener.EventListeners(this).ElementTouchListener);
+                co.setOnTouchListener(new EventListeners(this).ElementTouchListener);
                 content.addView(co);
             }
         }
 
-        content.setOnDragListener(new ShakeEventListener.EventListeners(this).LayoutDragListener);
+        content.setOnDragListener(new EventListeners(this).LayoutDragListener);
     }
 
     // Calculate the theoretical possible max score a user can get for each question.

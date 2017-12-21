@@ -13,6 +13,7 @@ import johnbere.chemistrydd.elements.Element;
 import johnbere.chemistrydd.R;
 
 // Class for the substantial events of the application
+// Why does this get duplicated???
 public class EventListeners {
     private BaseActivity activity;
 
